@@ -1,0 +1,58 @@
+\documentclass{report}
+\usepackage{graphicx} % Required for inserting images
+\usepackage[table]{xcolor}    % loads also »colortbl«
+\usepackage{array}
+\usepackage{tabularx} % Load the tabularx package
+\usepackage{hyperref}
+\usepackage{mathtools}
+\usepackage{amsmath}
+
+\usepackage{tcolorbox}
+\usepackage{fontawesome5}
+
+\Urlmuskip=0mu  plus 10mu
+\setlength{\parindent}{0pt}
+
+\renewcommand{\familydefault}{\sfdefault}
+\fontsize{12}{14}\selectfont
+\usepackage{setspace}
+\onehalfspacing
+
+\title{
+Transcoding Website Usability Survey \\
+Existing Solutions Questionnaire \\ 
+\large \emph{"Can a transcoding service be designed that provides sufficient education to allow a
+layman to effectively transcode video?"}
+}
+
+\author{Ben Fleuty \\ \texttt{1900040@abertay.ac.uk}}
+\date{16 February, 2023}
+
+
+\usepackage{titlesec}
+\titleformat{\chapter}[display]   
+{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}   
+\titlespacing*{\chapter}{0pt}{-50pt}{40pt}
+
+\pagenumbering{roman}
+
+
+\newcommand{\consentlink}{https://1drv.ms/b/s!AhkIcseg6EOIiqYWcs3tVVU4ZI-qVA?e=PwreWg}
+\newcommand{\formlink}{https://forms.office.com/e/bFB5V1BRVW}
+
+
+\begin{document}
+
+\maketitle
+\clearpage
+\tableofcontents
+\clearpage
+\input{introduction.tex}
+\clearpage
+\input{about-participant.tex}
+\clearpage
+
+\input{existing-services.tex}
+\clearpage
+\input{outro.tex}
+\end{document}
