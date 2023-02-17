@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "dTtXabf8/S8/U1hx5PWaXhJ3z2NVmrPgkLJwTBbRO+Hz8hNqWSktUY4mu9/QH3CaI2azueLF+eKITPqgTanxTA==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\ben\\OneDrive - Abertay University\\Y4\\diss\\code\\TranscodeNowWebServer\\TranscodeNowWebServer\\TranscodeNowWebServer.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ben\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.17.0\\microsoft.visualstudio.azure.containers.tools.targets.1.17.0.nupkg.sha512"
+  ],
+  "logs": []
+}
