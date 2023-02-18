@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\ben\\OneDrive - Abertay University\\Y4\\diss\\code\\TranscodeNowWebServer\\TranscodeNowWebServer\\TranscodeNowWebServer.csproj": {}
+    "C:\\Users\\ben\\OneDrive - Abertay University\\Y4\\dissertation\\code\\TranscodeNowWebServer\\TranscodeNowWebServer\\TranscodeNowWebServer.csproj": {}
   },
   "projects": {
-    "C:\\Users\\ben\\OneDrive - Abertay University\\Y4\\diss\\code\\TranscodeNowWebServer\\TranscodeNowWebServer\\TranscodeNowWebServer.csproj": {
+    "C:\\Users\\ben\\OneDrive - Abertay University\\Y4\\dissertation\\code\\TranscodeNowWebServer\\TranscodeNowWebServer\\TranscodeNowWebServer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ben\\OneDrive - Abertay University\\Y4\\diss\\code\\TranscodeNowWebServer\\TranscodeNowWebServer\\TranscodeNowWebServer.csproj",
+        "projectUniqueName": "C:\\Users\\ben\\OneDrive - Abertay University\\Y4\\dissertation\\code\\TranscodeNowWebServer\\TranscodeNowWebServer\\TranscodeNowWebServer.csproj",
         "projectName": "TranscodeNowWebServer",
-        "projectPath": "C:\\Users\\ben\\OneDrive - Abertay University\\Y4\\diss\\code\\TranscodeNowWebServer\\TranscodeNowWebServer\\TranscodeNowWebServer.csproj",
+        "projectPath": "C:\\Users\\ben\\OneDrive - Abertay University\\Y4\\dissertation\\code\\TranscodeNowWebServer\\TranscodeNowWebServer\\TranscodeNowWebServer.csproj",
         "packagesPath": "C:\\Users\\ben\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ben\\OneDrive - Abertay University\\Y4\\diss\\code\\TranscodeNowWebServer\\TranscodeNowWebServer\\obj\\",
+        "outputPath": "C:\\Users\\ben\\OneDrive - Abertay University\\Y4\\dissertation\\code\\TranscodeNowWebServer\\TranscodeNowWebServer\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\ben\\AppData\\Roaming\\NuGet\\NuGet.Config",
