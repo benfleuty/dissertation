@@ -4,17 +4,17 @@
 <link rel="stylesheet" href="css/dragAndDrop.css" />
 
 <div @ref="@dragAndDropContainer" class="drop-zone w-100">
-	<p>Drop a file or select one using the button below</p>
 	<form>
 		<div @ref="@fileUploadControl">
 			<p class="upload-step text-center">Step 1</p>
 			<label for="fileInput" class="visually-hidden">Choose your file:</label>
 			<InputFile id="fileInput" OnChange="@OnChange" class="form-control" />
+			<p class="text-center opacity-75">Or drop a file here</p>
 		</div>
 		<div class="mt-4">
 			<p class="upload-step text-center">Step 2</p>
 			<label for="btnUpload" class="visually-hidden">Click here to upload your file:</label>
-			<button class="btn btn-primary my-2 form-control" @onclick="BtnUploadFile">Upload</button>
+			<button class="btn btn-primary my-2 form-control" @onclick="BtnUploadFile" type="button">Upload</button>
 		</div>
 	</form>
 </div>
