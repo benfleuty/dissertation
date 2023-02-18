@@ -1,0 +1,15 @@
+﻿.drop-zone {
+    padding: 20px;
+    width: 60%;
+    min-height: 200px;
+    border: 2px dashed black;
+    border-radius: 8px;
+}
+
+    .drop-zone.hover {
+        border-style: solid;
+    }
+
+.upload-step {
+    font-weight: 700;
+}

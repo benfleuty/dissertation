@@ -1,0 +1,118 @@
+﻿@inject IJSRuntime JSRuntime
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment env
+
+<link rel="stylesheet" href="css/dragAndDrop.css" />
+
+<div @ref="@dragAndDropContainer" class="drop-zone w-100">
+	<p>Drop a file or select one using the button below</p>
+	<form>
+		<div @ref="@fileUploadControl">
+			<p class="upload-step text-center">Step 1</p>
+			<label for="fileInput" class="visually-hidden">Choose your file:</label>
+			<InputFile id="fileInput" OnChange="@OnChange" class="form-control" />
+		</div>
+		<div class="mt-4">
+			<p class="upload-step text-center">Step 2</p>
+			<label for="btnUpload" class="visually-hidden">Click here to upload your file:</label>
+			<button class="btn btn-primary my-2 form-control" @onclick="BtnUploadFile">Upload</button>
+		</div>
+	</form>
+</div>
+
+@code {
+	ElementReference dragAndDropContainer;
+	ElementReference fileUploadControl;
+
+	IJSObjectReference _module;
+	IJSObjectReference _dropZoneInstance;
+
+	string fileSource;
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			_module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/js/dragAndDrop.js");
+			_dropZoneInstance = await _module.InvokeAsync<IJSObjectReference>("initialiseFileDropZone", dragAndDropContainer, fileUploadControl);
+
+			foreach (string file in Directory.GetFiles($@"{env.WebRootPath}\uploads\"))
+			{
+				File.Delete(file);
+			}
+		}
+	}
+
+	IBrowserFile? file;
+	long bbbSize = 355856562;
+	long bbbSizeMax = 391442218;
+	long bbbSizeMin = 320270905;
+
+	async Task OnChange(InputFileChangeEventArgs e)
+	{
+		if (e.File.Size > bbbSizeMax)
+		{
+			// todo throw up an error message as the file is too big
+			await _module.InvokeAsync<IJSObjectReference>("clearUploadControl", fileUploadControl);
+			return;
+		}
+
+		if (e.File.Size < bbbSizeMin)
+		{
+			// todo throw up an error message as the file is too small
+			await _module.InvokeAsync<IJSObjectReference>("clearUploadControl", fileUploadControl);
+			return;
+		}
+
+		file = e.File;
+
+	}
+
+	string GenerateFilename()
+	{
+		return file.Name ?? throw new NullReferenceException("No name set for uploaded file");
+	}
+
+	async void BtnUploadFile()
+	{
+		Stream stream;
+
+		if (file is null)
+		{
+			// todo throw up an error message as no file is given
+			return;
+		}
+
+		if (file.Size > bbbSizeMax)
+		{
+			// todo throw up an error message as the file is too big
+			await _module.InvokeAsync<IJSObjectReference>("clearUploadControl", fileUploadControl);
+			return;
+		}
+
+		if (file.Size < bbbSizeMin)
+		{
+			// todo throw up an error message as the file is too small
+			await _module.InvokeAsync<IJSObjectReference>("clearUploadControl", fileUploadControl);
+			return;
+		}
+		try
+		{
+
+			stream = file.OpenReadStream(bbbSizeMax);
+		}
+		catch (Exception)
+		{
+			// todo throw up an error message as the file is too big
+			await _module.InvokeAsync<IJSObjectReference>("clearUploadControl", fileUploadControl);
+			return;
+		}
+
+		// todo generate a random name for the file
+		string filePath = $@"{env.WebRootPath}\uploads\{GenerateFilename()}";
+		FileStream fsW = File.Create(filePath);
+		await stream.CopyToAsync(fsW);
+		stream.Close();
+		fsW.Close();
+	}
+
+}
