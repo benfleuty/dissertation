@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 var http = new HttpClient();
 var url = "http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_60fps_normal.mp4";
@@ -32,15 +33,40 @@ Console.WriteLine("Response was a success");
 var stream = File.OpenRead("input.mp4");
 var fileName = Path.GetRandomFileName();
 
-// Save the stream to a file on disk, and report the progress using the Progress<T> object
+// Save the stream to a file on disk
 using var fileStream = new FileStream(fileName, FileMode.Create);
 await stream.CopyToAsync(fileStream);
+
+// Validate that it is a valid MIME type
+var process = new Process();
+
+// Configure the process to run ffmpeg with the downloaded file as input
+process.StartInfo.FileName = "file";
+process.StartInfo.Arguments = $"--mime-type -b {fileName}";
+process.StartInfo.UseShellExecute = false;
+process.StartInfo.RedirectStandardOutput = true;
+process.StartInfo.RedirectStandardError = true;
+
+process.Start();
+process.WaitForExit();
+
+string mimeType = process.StandardOutput.ReadToEnd();
+// if not and audio or video type
+if(Regex.Match(mimeType, "^(audio|video)/.*").Success == false)
+{
+	// todo handle invalid file
+	Console.WriteLine($"The given file is not supported:{mimeType}");
+	return;
+}
+
+Console.WriteLine($"Supported MIME type:{mimeType}");
+
 
 // Set the output file path
 var outputPath = $"{fileName}__transcoded";
 
 // Create a process to run ffmpeg
-var process = new Process();
+process = new Process();
 
 // Configure the process to run ffmpeg with the downloaded file as input
 process.StartInfo.FileName = "ffmpeg";
