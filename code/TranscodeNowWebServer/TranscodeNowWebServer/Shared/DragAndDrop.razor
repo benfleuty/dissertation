@@ -10,12 +10,33 @@
 			<label for="fileInput" class="visually-hidden">Choose your file:</label>
 			<InputFile id="fileInput" OnChange="@OnChange" class="form-control" />
 			<p class="text-center opacity-75">Or drop a file here</p>
+			@if (file is not null)
+			{
+				string article = "a";
+				if (new[] { 'a', 'e', 'i', 'o', 'u' }.Contains(char.ToLower(mime.type[0])))
+				{
+					article = "an";
+				}
+				<p>
+					You have selected @article @mime.type file.
+				</p>
+				if (mime.IsSupported == false)
+				{
+					<p class="text-danger">
+						This file type is not supported! Please select an audio or video file.
+					</p>
+				}
+
+			}
 		</div>
-		<div class="mt-4">
-			<p class="upload-step text-center">Step 2</p>
-			<label for="btnUpload" class="visually-hidden">Click here to upload your file:</label>
-			<button class="btn btn-primary my-2 form-control" @onclick="BtnUploadFile" type="button">Upload</button>
-		</div>
+		@if (file is not null && mime.IsSupported)
+		{
+			<div class="mt-4">
+				<p class="upload-step text-center">Step 2</p>
+				<label for="btnUpload" class="visually-hidden">Click here to upload your file:</label>
+				<button class="btn btn-primary my-2 form-control" @onclick="BtnUploadFile" type="button">Upload</button>
+			</div>
+		}
 	</form>
 </div>
 
@@ -47,24 +68,52 @@
 	long bbbSizeMax = 391442218;
 	long bbbSizeMin = 320270905;
 
+	struct MIME
+	{
+		public string type;
+		public string subtype;
+
+		public MIME(string t, string s)
+		{
+			type = t;
+			subtype = s;
+		}
+
+		public override string ToString()
+		{
+			return $"{type}/{subtype}";
+		}
+
+		public bool IsSupported => type == "audio" || type == "video";
+	}
+
+	MIME mime;
+
 	async Task OnChange(InputFileChangeEventArgs e)
 	{
-		if (e.File.Size > bbbSizeMax)
-		{
-			// todo throw up an error message as the file is too big
-			await _module.InvokeAsync<IJSObjectReference>("clearUploadControl", fileUploadControl);
-			return;
-		}
+		IBrowserFile uploaded = e.File;
 
-		if (e.File.Size < bbbSizeMin)
-		{
-			// todo throw up an error message as the file is too small
-			await _module.InvokeAsync<IJSObjectReference>("clearUploadControl", fileUploadControl);
-			return;
-		}
+		//if (uploaded.Size > bbbSizeMax)
+		//{
+		//	// todo throw up an error message as the file is too big
+		//	await _module.InvokeAsync<IJSObjectReference>("clearUploadControl", fileUploadControl);
+		//	return;
+		//}
 
-		file = e.File;
+		//if (uploaded.Size < bbbSizeMin)
+		//{
+		//	// todo throw up an error message as the file is too small
+		//	await _module.InvokeAsync<IJSObjectReference>("clearUploadControl", fileUploadControl);
+		//	return;
+		//}
 
+		var parts = uploaded.ContentType.Split("/");
+		string type = parts[0];
+		string subtype = parts[1];
+
+		mime = new MIME(type, subtype);
+
+		file = uploaded;
 	}
 
 	string GenerateFilename()
@@ -82,19 +131,19 @@
 			return;
 		}
 
-		if (file.Size > bbbSizeMax)
-		{
-			// todo throw up an error message as the file is too big
-			await _module.InvokeAsync<IJSObjectReference>("clearUploadControl", fileUploadControl);
-			return;
-		}
+		//if (file.Size > bbbSizeMax)
+		//{
+		//	// todo throw up an error message as the file is too big
+		//	await _module.InvokeAsync<IJSObjectReference>("clearUploadControl", fileUploadControl);
+		//	return;
+		//}
 
-		if (file.Size < bbbSizeMin)
-		{
-			// todo throw up an error message as the file is too small
-			await _module.InvokeAsync<IJSObjectReference>("clearUploadControl", fileUploadControl);
-			return;
-		}
+		//if (file.Size < bbbSizeMin)
+		//{
+		//	// todo throw up an error message as the file is too small
+		//	await _module.InvokeAsync<IJSObjectReference>("clearUploadControl", fileUploadControl);
+		//	return;
+		//}
 		try
 		{
 
