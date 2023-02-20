@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Text.RegularExpressions;
+using TranscodeServerApp;
 
 var http = new HttpClient();
 var url = "http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_60fps_normal.mp4";
@@ -37,40 +38,15 @@ var fileName = Path.GetRandomFileName();
 using var fileStream = new FileStream(fileName, FileMode.Create);
 await stream.CopyToAsync(fileStream);
 
-// Validate that it is a valid MIME type
-var process = new Process();
-
-// Configure the process to run ffmpeg with the downloaded file as input
-process.StartInfo.FileName = "file";
-process.StartInfo.Arguments = $"--mime-type -b {fileName}";
-process.StartInfo.UseShellExecute = false;
-process.StartInfo.RedirectStandardOutput = true;
-process.StartInfo.RedirectStandardError = true;
-
-process.Start();
-process.WaitForExit();
-
-string mimeType = process.StandardOutput.ReadToEnd();
-// if not and audio or video type
-if(Regex.Match(mimeType, "^(audio|video)/.*").Success == false)
-{
-	// todo handle invalid file
-	Console.WriteLine($"The given file is not supported:{mimeType}");
-	return;
-}
-
-Console.WriteLine($"Supported MIME type:{mimeType}");
-
-
 // Set the output file path
 var outputPath = $"{fileName}__transcoded";
 
 // Create a process to run ffmpeg
-process = new Process();
+var process = new Process();
 
 // Configure the process to run ffmpeg with the downloaded file as input
 process.StartInfo.FileName = "ffmpeg";
-process.StartInfo.Arguments = $"-i \"{fileName}\" -c:v libx264 -preset ultrafast -crf 22 -c:a copy \"{outputPath}.mkv\"";
+process.StartInfo.Arguments = $"-hide_banner -loglevel warning -i \"{fileName}\" -c:v libx264 -preset ultrafast -crf 22 -c:a copy \"{outputPath}.mkv\"";
 process.StartInfo.UseShellExecute = false;
 process.StartInfo.RedirectStandardOutput = true;
 process.StartInfo.RedirectStandardError = true;
@@ -83,11 +59,26 @@ Console.WriteLine($"Transcoded {fileName} to {outputPath}");
 
 
 // Print the output of ffmpeg to the console
-Console.WriteLine(process.StandardOutput.ReadToEnd());
-Console.WriteLine(process.StandardError.ReadToEnd());
+string stdErr = process.StandardError.ReadToEnd();
+if (stdErr.Length > 0)
+{
+	Console.WriteLine($"Std Err: {stdErr}");
+	// todo better error finding/parsing
+}
 
-var files = Directory.GetFiles(".");
+var path = "./";
+var files = Directory.GetFiles(path);
+
+var output = "failure";
+
 foreach (var file in files)
 {
-	Console.WriteLine(file);
+	if (file.StartsWith($"{path}{outputPath}"))
+	{
+		if (stdErr.Length > 0) break;
+		output = "success";
+		break;
+	}
 }
+
+Console.WriteLine(output);

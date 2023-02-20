@@ -1,7 +1,8 @@
 *.zip
 
 *.mp4
-
+*.mkv
+transcode-server/txt
 
 
 
