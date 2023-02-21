@@ -16,9 +16,23 @@
 			<label for="fileInput" class="visually-hidden">Choose your file:</label>
 			<InputFile id="fileInput" OnChange="@OnChange" class="form-control" />
 			<p class="text-center opacity-75">Or drop a file here</p>
-			@if (file is not null && Regex.Match(file.ContentType, "^(audio|video)/.*").Success == false)
+			@if (file is not null)
 			{
-				<p class="text-danger">The file you have uploaded is not supported! (@file.ContentType)</p>
+				string article = "a";
+				if (new[] { 'a', 'e', 'i', 'o', 'u' }.Contains(char.ToLower(mime.type[0])))
+				{
+					article = "an";
+				}
+				<p>
+					You have selected @article @mime.type file.
+				</p>
+				if (mime.IsSupported == false)
+				{
+					<p class="text-danger">
+						This file type is not supported! Please select an audio or video file.
+					</p>
+				}
+
 			}
 		</div>
 		@if (file is not null && uploadedFileMime.IsSupported)
