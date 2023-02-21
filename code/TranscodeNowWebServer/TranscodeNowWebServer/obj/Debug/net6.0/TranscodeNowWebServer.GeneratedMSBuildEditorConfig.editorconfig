@@ -9,61 +9,61 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = TranscodeNowWebServer
 build_property.RootNamespace = TranscodeNowWebServer
-build_property.ProjectDir = C:\Users\ben\OneDrive - Abertay University\Y4\dissertation\code\TranscodeNowWebServer\TranscodeNowWebServer\
+build_property.ProjectDir = c:\Users\ben\OneDrive - Abertay University\Y4\dissertation\code\TranscodeNowWebServer\TranscodeNowWebServer\
 build_property.RazorLangVersion = 6.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\ben\OneDrive - Abertay University\Y4\dissertation\code\TranscodeNowWebServer\TranscodeNowWebServer
+build_property.MSBuildProjectDirectory = c:\Users\ben\OneDrive - Abertay University\Y4\dissertation\code\TranscodeNowWebServer\TranscodeNowWebServer
 build_property._RazorSourceGeneratorDebug = 
 
-[C:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/App.razor]
+[c:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/App.razor]
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/Pages/Counter.razor]
+[c:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/Pages/Counter.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ291bnRlci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/Pages/FetchData.razor]
+[c:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/Pages/FetchData.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRmV0Y2hEYXRhLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/Pages/Index.razor]
+[c:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/Pages/Index.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/Pages/Upload.razor]
+[c:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/Pages/Upload.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXBsb2FkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/Shared/DragAndDrop.razor]
+[c:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/Shared/DragAndDrop.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXERyYWdBbmREcm9wLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/Shared/SurveyPrompt.razor]
+[c:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/Shared/SurveyPrompt.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFN1cnZleVByb21wdC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/_Imports.razor]
+[c:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/Shared/MainLayout.razor]
+[c:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/Shared/MainLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5MYXlvdXQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-1dh04p8vq2
 
-[C:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/Shared/NavMenu.razor]
+[c:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/Shared/NavMenu.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdk1lbnUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-say5hftpto
 
-[C:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/Pages/Error.cshtml]
+[c:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/Pages/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/Pages/_Host.cshtml]
+[c:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/Pages/_Host.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0hvc3QuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/Pages/_Layout.cshtml]
+[c:/Users/ben/OneDrive - Abertay University/Y4/dissertation/code/TranscodeNowWebServer/TranscodeNowWebServer/Pages/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0xheW91dC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 

@@ -49,3 +49,7 @@ export function clearUploadControl(fileUploadControl) {
     inputFile.value = null;
     return inputFile;
 }
+
+export function log(data) {
+    console.log(data);
+}

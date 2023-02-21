@@ -1,5 +1,7 @@
-﻿@inject IJSRuntime JSRuntime
+﻿@using System.Text.RegularExpressions;
+@inject IJSRuntime JSRuntime
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment env
+@inject NavigationManager nav
 
 <link rel="stylesheet" href="css/dragAndDrop.css" />
 
@@ -10,23 +12,30 @@
 			<label for="fileInput" class="visually-hidden">Choose your file:</label>
 			<InputFile id="fileInput" OnChange="@OnChange" class="form-control" />
 			<p class="text-center opacity-75">Or drop a file here</p>
+			@if (file is not null && Regex.Match(file.ContentType,"^(audio|video)/.*").Success == false)
+			{
+				<p class="text-danger">The file you have uploaded is not supported! (@file.ContentType)</p>
+			}
 		</div>
-		<div class="mt-4">
-			<p class="upload-step text-center">Step 2</p>
-			<label for="btnUpload" class="visually-hidden">Click here to upload your file:</label>
-			<button class="btn btn-primary my-2 form-control" @onclick="BtnUploadFile" type="button">Upload</button>
-		</div>
+		@if (file is not null && uploadedFileMime.IsSupported)
+		{
+			<div class="mt-4">
+				<p class="upload-step text-center">Step 2</p>
+				<label for="btnUpload" class="visually-hidden">Click here to upload your file:</label>
+				<button class="btn btn-primary my-2 form-control" @onclick="BtnUploadFile" type="button" disabled="@DisableUploadButton">Upload</button>
+			</div>
+		}
 	</form>
 </div>
 
 @code {
+
 	ElementReference dragAndDropContainer;
 	ElementReference fileUploadControl;
+	IJSObjectReference? _module;
+	IJSObjectReference? _dropZoneInstance;
 
-	IJSObjectReference _module;
-	IJSObjectReference _dropZoneInstance;
-
-	string fileSource;
+	bool DisableUploadButton = false;
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
@@ -34,6 +43,10 @@
 		{
 			_module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/js/dragAndDrop.js");
 			_dropZoneInstance = await _module.InvokeAsync<IJSObjectReference>("initialiseFileDropZone", dragAndDropContainer, fileUploadControl);
+			string uploadPath = $@"{env.WebRootPath}\uploads\";
+
+			if (Directory.Exists(uploadPath) == false)
+				Directory.CreateDirectory(uploadPath);
 
 			foreach (string file in Directory.GetFiles($@"{env.WebRootPath}\uploads\"))
 			{
@@ -43,76 +56,76 @@
 	}
 
 	IBrowserFile? file;
-	long bbbSize = 355856562;
-	long bbbSizeMax = 391442218;
-	long bbbSizeMin = 320270905;
-
-	async Task OnChange(InputFileChangeEventArgs e)
+	struct MIME
 	{
-		if (e.File.Size > bbbSizeMax)
+		public string type;
+		public string subtype;
+		public MIME(string t, string s)
 		{
-			// todo throw up an error message as the file is too big
-			await _module.InvokeAsync<IJSObjectReference>("clearUploadControl", fileUploadControl);
-			return;
+			type = t;
+			subtype = s;
 		}
 
-		if (e.File.Size < bbbSizeMin)
+		public override string ToString()
 		{
-			// todo throw up an error message as the file is too small
-			await _module.InvokeAsync<IJSObjectReference>("clearUploadControl", fileUploadControl);
-			return;
+			return $"{type}/{subtype}";
 		}
 
-		file = e.File;
-
+		public bool IsSupported => type == "audio" || type == "video";
 	}
 
-	string GenerateFilename()
+	MIME uploadedFileMime;
+	async Task OnChange(InputFileChangeEventArgs e)
 	{
-		return file.Name ?? throw new NullReferenceException("No name set for uploaded file");
+		file = null;
+		var uploaded = e.File;
+		var parts = uploaded.ContentType.Split("/");
+		string type = parts[0];
+		string subtype = parts[1];
+		uploadedFileMime = new MIME(type, subtype);
+		file = uploaded;
 	}
 
 	async void BtnUploadFile()
 	{
+		DisableUploadButton = true;
 		Stream stream;
-
 		if (file is null)
 		{
 			// todo throw up an error message as no file is given
+			await _module.InvokeVoidAsync("log", "No file given - will not upload");
+			DisableUploadButton = false;
 			return;
 		}
 
-		if (file.Size > bbbSizeMax)
-		{
-			// todo throw up an error message as the file is too big
-			await _module.InvokeAsync<IJSObjectReference>("clearUploadControl", fileUploadControl);
-			return;
-		}
-
-		if (file.Size < bbbSizeMin)
-		{
-			// todo throw up an error message as the file is too small
-			await _module.InvokeAsync<IJSObjectReference>("clearUploadControl", fileUploadControl);
-			return;
-		}
 		try
 		{
-
-			stream = file.OpenReadStream(bbbSizeMax);
+			stream = file.OpenReadStream(file.Size);
 		}
 		catch (Exception)
 		{
-			// todo throw up an error message as the file is too big
-			await _module.InvokeAsync<IJSObjectReference>("clearUploadControl", fileUploadControl);
+			await _module.InvokeVoidAsync("log", "There was an error reading the file");
+			DisableUploadButton = false;
 			return;
 		}
 
-		// todo generate a random name for the file
-		string filePath = $@"{env.WebRootPath}\uploads\{GenerateFilename()}";
+		string newFileName = Path.ChangeExtension(
+			Path.GetRandomFileName(),
+			Path.GetExtension(file.Name));
+
+		string filePath = $@"{env.WebRootPath}\uploads\{newFileName}";
 		FileStream fsW = File.Create(filePath);
 		await stream.CopyToAsync(fsW);
 		stream.Close();
 		fsW.Close();
-	}
 
+		// enter filenames into sql database
+
+
+		// enter random filename into redis
+
+
+		// redirect to transcoding progress page
+		nav.NavigateTo("/transcode");
+	}
 }
