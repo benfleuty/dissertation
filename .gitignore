@@ -7,7 +7,7 @@ transcode-server/txt
 
 
 **/*/wwwroot/uploads
-
+transcode-server/*.*
 
 
 ## Ignore Visual Studio temporary files, build results, and
