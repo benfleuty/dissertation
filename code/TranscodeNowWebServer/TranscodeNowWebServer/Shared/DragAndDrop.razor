@@ -19,14 +19,14 @@
 			@if (file is not null)
 			{
 				string article = "a";
-				if (new[] { 'a', 'e', 'i', 'o', 'u' }.Contains(char.ToLower(mime.type[0])))
+				if (new[] { 'a', 'e', 'i', 'o', 'u' }.Contains(char.ToLower(uploadedFileMime.type[0])))
 				{
 					article = "an";
 				}
 				<p>
-					You have selected @article @mime.type file.
+					You have selected @article @uploadedFileMime.type file.
 				</p>
-				if (mime.IsSupported == false)
+				if (uploadedFileMime.IsSupported == false)
 				{
 					<p class="text-danger">
 						This file type is not supported! Please select an audio or video file.

@@ -5,16 +5,13 @@ RUN apt-get update -y && apt-get install -y ffmpeg file
 
 # Copy the published app to the container
 COPY TranscodeServerApp/TranscodeServerApp/bin/Release/net6.0/publish/linux-x64/TranscodeServerApp /app/
-COPY bbb_sunflower_1080p_60fps_normal.mp4 /app/input.mp4
-#COPY example.mp4 /app/input.mp4
+#COPY bbb_sunflower_1080p_60fps_normal.mp4 /app/input.mp4
+#COPY gura2.webm /app/input.mp4
 # Replace with a red herring for MIME type testing
-#COPY image-that-is-a.mp4 /app/input.mp4
-# Alternate supported file testing with MKV
-#COPY sample_1280x720_surfing_with_audio.mkv /app/input.mp4
+COPY image-that-is-a.mp4 /app/input.mp4
+#COPY bbb_sunflower_1080p_60fps_normal.mp4.png /app/input.mp4
 
 #COPY txt /app/input.mp4
-
-WORKDIR /app
 
 # Set the working directory to /app
 WORKDIR /app
