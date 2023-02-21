@@ -45,7 +45,7 @@
 	{
 		if (firstRender)
 		{
-			_module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/js/dragAndDrop.js");
+			_module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/js/dragAndDrop.js") ?? throw new FileNotFoundException("Could not load dragAndDrop.js");
 			_dropZoneInstance = await _module.InvokeAsync<IJSObjectReference>("initialiseFileDropZone", dragAndDropContainer, fileUploadControl);
 			string uploadPath = $@"{env.WebRootPath}\uploads\";
 
