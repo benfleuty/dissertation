@@ -16,4 +16,8 @@
     <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\UploadedFilesLibrary\UploadedFilesLibrary.csproj" />
+  </ItemGroup>
+
 </Project>

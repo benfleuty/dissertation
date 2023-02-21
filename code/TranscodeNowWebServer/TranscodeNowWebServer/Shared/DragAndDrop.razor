@@ -1,7 +1,11 @@
 ﻿@using System.Text.RegularExpressions;
+@using UploadFilesLibrary
+@using TranscodeNowWebServer.Data
 @inject IJSRuntime JSRuntime
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment env
 @inject NavigationManager nav
+@inject IConfiguration config
+@inject ISqlDataAccess sql
 
 <link rel="stylesheet" href="css/dragAndDrop.css" />
 
@@ -12,7 +16,7 @@
 			<label for="fileInput" class="visually-hidden">Choose your file:</label>
 			<InputFile id="fileInput" OnChange="@OnChange" class="form-control" />
 			<p class="text-center opacity-75">Or drop a file here</p>
-			@if (file is not null && Regex.Match(file.ContentType,"^(audio|video)/.*").Success == false)
+			@if (file is not null && Regex.Match(file.ContentType, "^(audio|video)/.*").Success == false)
 			{
 				<p class="text-danger">The file you have uploaded is not supported! (@file.ContentType)</p>
 			}
@@ -84,6 +88,7 @@
 		string subtype = parts[1];
 		uploadedFileMime = new MIME(type, subtype);
 		file = uploaded;
+		DisableUploadButton = false;
 	}
 
 	async void BtnUploadFile()
@@ -113,16 +118,33 @@
 			Path.GetRandomFileName(),
 			Path.GetExtension(file.Name));
 
+
+		// todo put into fileserver instead
 		string filePath = $@"{env.WebRootPath}\uploads\{newFileName}";
 		FileStream fsW = File.Create(filePath);
 		await stream.CopyToAsync(fsW);
 		stream.Close();
 		fsW.Close();
 
+		// create file model
+		var fileModel = new UploadedFileModel()
+			{
+				OriginalFileName = Path.GetFileNameWithoutExtension(file.Name),
+				RandomFileName = newFileName
+			};
+
 		// enter filenames into sql database
-
-
-		// enter random filename into redis
+		try
+		{
+			await sql.SaveData(UploadedFilesLibrary.StoredProcedures.FILE_INSERT,
+								"localhost-docker",
+								fileModel);
+		}
+		catch (Exception e)
+		{
+			await _module.InvokeVoidAsync("log", $"There was an error writing to the SQL database\n{e.Message}");
+		}
+		// todo enter random filename into redis
 
 
 		// redirect to transcoding progress page
