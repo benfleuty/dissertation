@@ -5,6 +5,8 @@ VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TranscodeNowWebServer", "TranscodeNowWebServer\TranscodeNowWebServer.csproj", "{8B9611D8-FB4C-4C3B-8145-9860CEC11CC6}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UploadedFilesLibrary", "C:\Users\ben\OneDrive - Abertay University\Y4\dissertation\code\TranscodeNowWebServer\UploadedFilesLibrary\UploadedFilesLibrary.csproj", "{09DE5F8E-5E18-4F96-93F4-BA2BEEA88B9B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{8B9611D8-FB4C-4C3B-8145-9860CEC11CC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B9611D8-FB4C-4C3B-8145-9860CEC11CC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B9611D8-FB4C-4C3B-8145-9860CEC11CC6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09DE5F8E-5E18-4F96-93F4-BA2BEEA88B9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09DE5F8E-5E18-4F96-93F4-BA2BEEA88B9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09DE5F8E-5E18-4F96-93F4-BA2BEEA88B9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09DE5F8E-5E18-4F96-93F4-BA2BEEA88B9B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
