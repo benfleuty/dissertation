@@ -16,4 +16,8 @@
     <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\ben\OneDrive - Abertay University\Y4\dissertation\code\TranscodeNowWebServer\UploadedFilesLibrary\UploadedFilesLibrary.csproj" />
+  </ItemGroup>
+
 </Project>
