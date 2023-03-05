@@ -1,28 +1,30 @@
-FROM alpine:latest
+FROM ubuntu:latest
 
-RUN apk update && \
-    apk add vsftpd && \
-    apk add openssl && \
-    rm -rf /var/cache/apk/*
+RUN apt update -y
+RUN apt install vsftpd -y
 
-RUN adduser -D -h /ftp -s /sbin/nologin -u 1001 --ingroup ftp ftpuser && \
-    echo "ftpuser:ftppassword" | chpasswd
+RUN mkdir -p /fileserver/files
+RUN mkdir -p /var/run/vsftpd/empty
 
-RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-    -subj "/C=US/ST=CA/L=San Francisco/O=My Org/CN=localhost" \
-    -keyout /etc/vsftpd/vsftpd.key -out /etc/vsftpd/vsftpd.crt
+RUN chown root:root /var/run/vsftpd/empty
+RUN chmod 555 /var/run/vsftpd/empty
 
-RUN mkdir -p /var/log/vsftpd
-RUN touch /var/log/vsftpd/vsftpd.log
-RUN chown -R ftp:ftp /var/log/vsftpd
-RUN chmod 777 /var/log/vsftpd/vsftpd.log
+RUN addgroup ftp-data
 
-RUN mkdir -p /ftp/ftpuser && \
-    chown ftpuser:ftp /ftp/ftpuser && \
-    chmod 750 /ftp/ftpuser
+RUN adduser --disabled-password --gecos '' ftpuser
+RUN echo 'ftpuser:gwmxrpUH6cXTM5rC' | chpasswd
+RUN usermod -d /fileserver/files ftpuser
+RUN usermod -s /sbin/nologin ftpuser
 
-COPY vsftpd.conf /etc/vsftpd/
+RUN chown -R ftpuser:ftp-data /fileserver/files
+RUN chmod -R 777 /fileserver/files
+
+COPY vsftpd.conf /etc/vsftpd.conf
+COPY vsftpd.userlist /etc/vsftpd.userlist
+COPY vsftpd.chroot_list /etc/vsftpd.chroot_list
+
+VOLUME [ "/uploads-volume" ]
 
 EXPOSE 20 21 21100-21110
 
-CMD ["vsftpd", "/etc/vsftpd/vsftpd.conf"]
+CMD ["vsftpd"]
