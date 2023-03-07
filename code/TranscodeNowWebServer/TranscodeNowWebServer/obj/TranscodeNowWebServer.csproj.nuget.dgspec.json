@@ -44,6 +44,14 @@
               "target": "Package",
               "version": "[2.0.123, )"
             },
+            "FluentFTP": {
+              "target": "Package",
+              "version": "[45.2.0, )"
+            },
+            "Microsoft.AspNetCore.Http.Features": {
+              "target": "Package",
+              "version": "[5.0.17, )"
+            },
             "Microsoft.Data.SqlClient": {
               "target": "Package",
               "version": "[5.1.0, )"
@@ -51,6 +59,10 @@
             "Microsoft.Extensions.Configuration.Abstractions": {
               "target": "Package",
               "version": "[7.0.0, )"
+            },
+            "Microsoft.Extensions.Configuration.UserSecrets": {
+              "target": "Package",
+              "version": "[6.0.1, )"
             }
           },
           "imports": [
