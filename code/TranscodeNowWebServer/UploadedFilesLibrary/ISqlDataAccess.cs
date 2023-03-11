@@ -1,6 +1,7 @@
-﻿namespace UploadedFilesLibrary;
-
-public interface ISqlDataAccess
+﻿namespace UploadedFilesLibrary
 {
-	Task SaveData(string storedProc, string connName, object parameters);
+	public interface ISqlDataAccess
+	{
+		Task SaveData(string storedProc, string connName, object parameters);
+	}
 }

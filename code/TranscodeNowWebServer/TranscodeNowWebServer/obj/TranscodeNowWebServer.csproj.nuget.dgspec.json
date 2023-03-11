@@ -4,14 +4,82 @@
     "S:\\dissertation\\code\\TranscodeNowWebServer\\TranscodeNowWebServer\\TranscodeNowWebServer.csproj": {}
   },
   "projects": {
-    "C:\\Users\\ben\\OneDrive - Abertay University\\Y4\\dissertation\\code\\TranscodeNowWebServer\\UploadedFilesLibrary\\UploadedFilesLibrary.csproj": {
+    "S:\\dissertation\\code\\TranscodeNowWebServer\\TranscodeNowWebServer\\TranscodeNowWebServer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ben\\OneDrive - Abertay University\\Y4\\dissertation\\code\\TranscodeNowWebServer\\UploadedFilesLibrary\\UploadedFilesLibrary.csproj",
-        "projectName": "UploadedFilesLibrary",
-        "projectPath": "C:\\Users\\ben\\OneDrive - Abertay University\\Y4\\dissertation\\code\\TranscodeNowWebServer\\UploadedFilesLibrary\\UploadedFilesLibrary.csproj",
+        "projectUniqueName": "S:\\dissertation\\code\\TranscodeNowWebServer\\TranscodeNowWebServer\\TranscodeNowWebServer.csproj",
+        "projectName": "TranscodeNowWebServer",
+        "projectPath": "S:\\dissertation\\code\\TranscodeNowWebServer\\TranscodeNowWebServer\\TranscodeNowWebServer.csproj",
         "packagesPath": "C:\\Users\\ben\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ben\\OneDrive - Abertay University\\Y4\\dissertation\\code\\TranscodeNowWebServer\\UploadedFilesLibrary\\obj\\",
+        "outputPath": "S:\\dissertation\\code\\TranscodeNowWebServer\\TranscodeNowWebServer\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\ben\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "S:\\dissertation\\code\\TranscodeNowWebServer\\UploadedFilesLibrary\\UploadedFilesLibrary.csproj": {
+                "projectPath": "S:\\dissertation\\code\\TranscodeNowWebServer\\UploadedFilesLibrary\\UploadedFilesLibrary.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
+              "target": "Package",
+              "version": "[1.17.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.201\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "S:\\dissertation\\code\\TranscodeNowWebServer\\UploadedFilesLibrary\\UploadedFilesLibrary.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "S:\\dissertation\\code\\TranscodeNowWebServer\\UploadedFilesLibrary\\UploadedFilesLibrary.csproj",
+        "projectName": "UploadedFilesLibrary",
+        "projectPath": "S:\\dissertation\\code\\TranscodeNowWebServer\\UploadedFilesLibrary\\UploadedFilesLibrary.csproj",
+        "packagesPath": "C:\\Users\\ben\\.nuget\\packages\\",
+        "outputPath": "S:\\dissertation\\code\\TranscodeNowWebServer\\UploadedFilesLibrary\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\ben\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -48,21 +116,25 @@
               "target": "Package",
               "version": "[45.2.0, )"
             },
-            "Microsoft.AspNetCore.Http.Features": {
-              "target": "Package",
-              "version": "[5.0.17, )"
-            },
             "Microsoft.Data.SqlClient": {
               "target": "Package",
               "version": "[5.1.0, )"
+            },
+            "Microsoft.Extensions.Configuration": {
+              "target": "Package",
+              "version": "[7.0.0, )"
             },
             "Microsoft.Extensions.Configuration.Abstractions": {
               "target": "Package",
               "version": "[7.0.0, )"
             },
+            "Microsoft.Extensions.Configuration.FileExtensions": {
+              "target": "Package",
+              "version": "[7.0.0, )"
+            },
             "Microsoft.Extensions.Configuration.UserSecrets": {
               "target": "Package",
-              "version": "[6.0.1, )"
+              "version": "[7.0.0, )"
             }
           },
           "imports": [
@@ -77,74 +149,6 @@
           "assetTargetFallback": true,
           "warn": true,
           "frameworkReferences": {
-            "Microsoft.NETCore.App": {
-              "privateAssets": "all"
-            }
-          },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.201\\RuntimeIdentifierGraph.json"
-        }
-      }
-    },
-    "S:\\dissertation\\code\\TranscodeNowWebServer\\TranscodeNowWebServer\\TranscodeNowWebServer.csproj": {
-      "version": "1.0.0",
-      "restore": {
-        "projectUniqueName": "S:\\dissertation\\code\\TranscodeNowWebServer\\TranscodeNowWebServer\\TranscodeNowWebServer.csproj",
-        "projectName": "TranscodeNowWebServer",
-        "projectPath": "S:\\dissertation\\code\\TranscodeNowWebServer\\TranscodeNowWebServer\\TranscodeNowWebServer.csproj",
-        "packagesPath": "C:\\Users\\ben\\.nuget\\packages\\",
-        "outputPath": "S:\\dissertation\\code\\TranscodeNowWebServer\\TranscodeNowWebServer\\obj\\",
-        "projectStyle": "PackageReference",
-        "configFilePaths": [
-          "C:\\Users\\ben\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
-        ],
-        "originalTargetFrameworks": [
-          "net6.0"
-        ],
-        "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "https://api.nuget.org/v3/index.json": {}
-        },
-        "frameworks": {
-          "net6.0": {
-            "targetAlias": "net6.0",
-            "projectReferences": {
-              "C:\\Users\\ben\\OneDrive - Abertay University\\Y4\\dissertation\\code\\TranscodeNowWebServer\\UploadedFilesLibrary\\UploadedFilesLibrary.csproj": {
-                "projectPath": "C:\\Users\\ben\\OneDrive - Abertay University\\Y4\\dissertation\\code\\TranscodeNowWebServer\\UploadedFilesLibrary\\UploadedFilesLibrary.csproj"
-              }
-            }
-          }
-        },
-        "warningProperties": {
-          "warnAsError": [
-            "NU1605"
-          ]
-        }
-      },
-      "frameworks": {
-        "net6.0": {
-          "targetAlias": "net6.0",
-          "dependencies": {
-            "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
-              "target": "Package",
-              "version": "[1.17.0, )"
-            }
-          },
-          "imports": [
-            "net461",
-            "net462",
-            "net47",
-            "net471",
-            "net472",
-            "net48",
-            "net481"
-          ],
-          "assetTargetFallback": true,
-          "warn": true,
-          "frameworkReferences": {
-            "Microsoft.AspNetCore.App": {
-              "privateAssets": "none"
-            },
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
