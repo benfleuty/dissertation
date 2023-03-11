@@ -140,9 +140,22 @@
 		}
 	}
 
-	async Task<bool> UploadToFileServer(UploadedFileModel uploadedFileModel)
+	async Task<bool> UploadToFileServer(Stream stream, UploadedFileModel uploadedFileModel)
 	{
-		return true;
+		if (stream.Length < 1)
+		{
+			// todo throw up an error message as no file is given
+			await _module.InvokeVoidAsync("log", "No file given - will not upload");
+			DisableUploadButton = false;
+			return false;
+		}
+
+		string filePath = $@"{env.WebRootPath}\uploads\{uploadedFileModel.RandomFileName}";
+		FileStream fsW = File.Create(filePath);
+		await stream.CopyToAsync(fsW);
+		stream.Close();
+		fsW.Close();
+		return await FileUploader.UploadFile(filePath);
 	}
 
 	async Task<bool> SendTranscodeMessage(){
@@ -153,7 +166,7 @@
 	{
 		DisableUploadButton = true;
 
-		var stream = GetStreamFromFile().Result;
+		var stream = await GetStreamFromFile();
 		if (stream is null || file is null)
 		{
 			DisableUploadButton = false;
@@ -173,37 +186,32 @@
 
 
 		// upload to fileserver
-		var uploadTask = UploadToFileServer(fileModel);
+		var uploadTask = await UploadToFileServer(stream,fileModel);
 
 		// enter filename into database
-		var insertTask = InsertFileNameIntoDatabase(fileModel);
+		var insertTask = await InsertFileNameIntoDatabase(fileModel);
 
 		// send message that file is ready to be transcoded
-		var messageTask = SendTranscodeMessage();
+		var messageTask = await SendTranscodeMessage();
 
 		// todo enter random filename into redis
 
-
-		// wait for results
-
-		await Task.WhenAll(uploadTask, insertTask, messageTask);
-
 		//// SQL
-		var databaseResult = insertTask.Result;
+		var databaseResult = insertTask;
 		if(databaseResult == false)
 		{
 			return;
 		}
 
 		//// Upload
-		var uploadResult = uploadTask.Result;
+		var uploadResult = uploadTask;
 		if(uploadResult == false)
 		{
 			return;
 		}
 
 		//// Transcode Message
-		var messageResult = messageTask.Result;
+		var messageResult = messageTask;
 		if(messageResult == false)
 		{
 			return;
