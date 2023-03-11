@@ -2,7 +2,7 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
-namespace UploadFilesLibrary;
+namespace UploadedFilesLibrary;
 
 public class SqlDataAccess : ISqlDataAccess
 {
