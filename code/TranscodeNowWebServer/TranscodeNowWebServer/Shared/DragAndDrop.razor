@@ -1,4 +1,5 @@
 ﻿@using System.Text.RegularExpressions;
+@using FluentFTP;
 @using UploadedFilesLibrary
 @using TranscodeNowWebServer.Data
 @inject IJSRuntime JSRuntime
@@ -44,6 +45,17 @@
             </div>
         }
     </form>
+
+    @if (Progress is not null)
+    {
+        <div class="mt-4">
+            <p class="progress-step text-center">Step 3</p>
+
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: @Progress%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">@Progress</div>
+            </div>
+        </div>
+    }
 </div>
 
 @code {
@@ -56,22 +68,34 @@
     bool DisableUploadButton = false;
     string uploadPath = string.Empty;
 
+    private int? _progress;
+
+    public int? Progress
+    {
+        get => _progress;
+        set
+        {
+            _progress = value;
+            StateHasChanged();
+        }
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (!firstRender) return;
+
+        _module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/js/dragAndDrop.js") ?? throw new FileNotFoundException("Could not load dragAndDrop.js");
+        _dropZoneInstance = await _module.InvokeAsync<IJSObjectReference>("initialiseFileDropZone", dragAndDropContainer, fileUploadControl);
+        uploadPath = $@"{env.WebRootPath}\uploads\";
+
+        if (Directory.Exists(uploadPath) == false)
+            Directory.CreateDirectory(uploadPath);
+
+        foreach (string file in Directory.GetFiles(uploadPath))
         {
-            _module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/js/dragAndDrop.js") ?? throw new FileNotFoundException("Could not load dragAndDrop.js");
-            _dropZoneInstance = await _module.InvokeAsync<IJSObjectReference>("initialiseFileDropZone", dragAndDropContainer, fileUploadControl);
-            uploadPath = $@"{env.WebRootPath}\uploads\";
-
-            if (Directory.Exists(uploadPath) == false)
-                Directory.CreateDirectory(uploadPath);
-
-            foreach (string file in Directory.GetFiles(uploadPath))
-            {
-                File.Delete(file);
-            }
+            File.Delete(file);
         }
+
     }
 
     IBrowserFile? file;
@@ -149,6 +173,7 @@
         if (stream.Length < 1)
         {
             // todo throw up an error message as no file is given
+            if (_module is null) throw new NullReferenceException();
             await _module.InvokeVoidAsync("log", "No file given - will not upload");
             DisableUploadButton = false;
             return false;
@@ -159,7 +184,15 @@
         await stream.CopyToAsync(fsW);
         stream.Close();
         fsW.Close();
-        return FileUploader.UploadFile(filePath);
+
+        Action<FtpProgress> progress = delegate (FtpProgress p)
+        {
+            Progress = (int)p.Progress;
+            Console.WriteLine(Progress);
+        };
+
+
+        return await FileUploader.UploadFile(filePath, progress);
     }
 
     async Task<bool> SendTranscodeMessage()
