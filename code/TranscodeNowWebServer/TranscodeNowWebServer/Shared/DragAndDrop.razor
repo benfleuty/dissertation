@@ -93,7 +93,7 @@
 	}
 
 	MIME uploadedFileMime;
-	async Task OnChange(InputFileChangeEventArgs e)
+	void OnChange(InputFileChangeEventArgs e)
 	{
 		file = null;
 		var uploaded = e.File;
@@ -109,7 +109,8 @@
 	{
 		if (file is null)
 		{
-			await _module.InvokeVoidAsync("log", "No file given - will not upload");
+			if (_module is null) throw new NullReferenceException();
+			await _module.InvokeVoidAsync("log", "No file given - will not upload"); 
 			return null;
 		}
 
@@ -119,7 +120,8 @@
 		}
 		catch (Exception)
 		{
-			await _module.InvokeVoidAsync("log", "There was an error reading the file");
+			if (_module is null) throw new NullReferenceException();
+			await _module.InvokeVoidAsync("log", "There was an error reading the file"); 
 			return null;
 		}
 	}
@@ -135,17 +137,41 @@
 		}
 		catch (Exception e)
 		{
+			if (_module is null) throw new NullReferenceException();
 			await _module.InvokeVoidAsync("log", $"There was an error writing to the SQL database\n{e.Message}");
 			return false;
 		}
 	}
 
-	async Task<bool> UploadToFileServer(UploadedFileModel uploadedFileModel)
+	async Task<bool> UploadToFileServer(Stream stream, UploadedFileModel uploadedFileModel)
 	{
-		return true;
+		if (stream.Length < 1)
+		{
+			// todo throw up an error message as no file is given
+			if (_module is null) throw new NullReferenceException();
+			await _module.InvokeVoidAsync("log", "No file given - will not upload");
+			DisableUploadButton = false;
+			return false;
+		}
+
+		string filePath = $@"{env.WebRootPath}\uploads\{uploadedFileModel.RandomFileName}";
+		FileStream fsW = File.Create(filePath);
+		await stream.CopyToAsync(fsW);
+		stream.Close();
+		fsW.Close();
+		var success = FileUploader.UploadFile(filePath);
+		if (success == false)
+		{
+			if (_module is null) throw new NullReferenceException();
+			await _module.InvokeVoidAsync("log", "Failed to upload file...");
+			return false;
+		}
+
+		return success;
 	}
 
-	async Task<bool> SendTranscodeMessage(){
+	bool SendTranscodeMessage()
+	{
 		return true;
 	}
 
@@ -153,7 +179,7 @@
 	{
 		DisableUploadButton = true;
 
-		var stream = GetStreamFromFile().Result;
+		var stream = await GetStreamFromFile();
 		if (stream is null || file is null)
 		{
 			DisableUploadButton = false;
@@ -173,7 +199,7 @@
 
 
 		// upload to fileserver
-		var uploadTask = UploadToFileServer(fileModel);
+		var uploadTask = UploadToFileServer(stream, fileModel);
 
 		// enter filename into database
 		var insertTask = InsertFileNameIntoDatabase(fileModel);
@@ -183,28 +209,23 @@
 
 		// todo enter random filename into redis
 
-
-		// wait for results
-
-		await Task.WhenAll(uploadTask, insertTask, messageTask);
-
 		//// SQL
 		var databaseResult = insertTask.Result;
-		if(databaseResult == false)
+		if (databaseResult == false)
 		{
 			return;
 		}
 
 		//// Upload
 		var uploadResult = uploadTask.Result;
-		if(uploadResult == false)
+		if (uploadResult == false)
 		{
 			return;
 		}
 
 		//// Transcode Message
-		var messageResult = messageTask.Result;
-		if(messageResult == false)
+		var messageResult = messageTask;
+		if (messageResult == false)
 		{
 			return;
 		}
