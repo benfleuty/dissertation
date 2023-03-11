@@ -15,8 +15,10 @@ public class FileUploader
 		var config = builder.Build();
 
 		string url = "localhost";
-		string username = config["FtpUserName"] ?? throw new NullReferenceException();
-		string password = config["FtpPassword"] ?? throw new NullReferenceException();
+		string username = config["FtpUserName"] 
+			?? throw new NullReferenceException();
+		string password = config["FtpPassword"] 
+			?? throw new NullReferenceException();
 		var creds = new NetworkCredential(username, password);
 		return new FtpClient(url, creds);
 	}
@@ -24,7 +26,8 @@ public class FileUploader
 
 	public static bool UploadFile(string path)
 	{
-		FtpClient ftp = CreateFtpClient();
+		using FtpClient ftp = CreateFtpClient();
+		ftp.AutoConnect();
 		var status = ftp.UploadFile(path, Path.GetFileName(path));
 		return status == FtpStatus.Success;
 	}
