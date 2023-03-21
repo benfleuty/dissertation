@@ -1,6 +1,9 @@
 ﻿@using System.Text.RegularExpressions;
 @using FluentFTP;
-@using UploadedFilesLibrary
+@using System.Text;
+@using RabbitMQ.Client;
+@using RabbitMQ.Client.Events;
+@using UploadedFilesLibrary;
 @using TranscodeNowWebServer.Data
 @inject IJSRuntime JSRuntime
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment env
@@ -197,6 +200,31 @@
 
     async Task<bool> SendTranscodeMessage()
     {
+        var factory = new ConnectionFactory() { HostName = "localhost" };
+        using var connection = factory.CreateConnection();
+        using var channel = connection.CreateModel();
+
+        channel.ConfirmSelect();
+
+        // declare a durable queue
+        channel.QueueDeclare("transcode", true, false, false, null);
+
+        // create the message body as a byte array
+        byte[] messageBody = Encoding.UTF8.GetBytes("Hello, world!");
+
+        // create the message properties with delivery mode set to 2 (persistent)
+        var properties = channel.CreateBasicProperties();
+        properties.ContentType = "text/plain";
+        properties.DeliveryMode = 2;
+
+        // publish the message with publisher confirm
+        channel.BasicPublish("", "transcode", properties, messageBody);
+        if (!channel.WaitForConfirms(TimeSpan.FromSeconds(10)))
+        {
+            Console.WriteLine("Message publish failed.");
+            return false;
+        }
+
         return true;
     }
 
@@ -225,36 +253,41 @@
 
         // upload to fileserver
         var uploadTask = await UploadToFileServer(stream, fileModel);
-
-        // enter filename into database
-        var insertTask = await InsertFileNameIntoDatabase(fileModel);
-
-        // send message that file is ready to be transcoded
-        var messageTask = await SendTranscodeMessage();
-
-        // todo enter random filename into redis
-
-        //// SQL
-        var databaseResult = insertTask;
-        if (databaseResult == false)
-        {
-            return;
-        }
-
-        //// Upload
         var uploadResult = uploadTask;
+
         File.Delete(
             Path.Combine(uploadPath, fileModel.RandomFileName)
         );
+
         if (uploadResult == false)
         {
+            await _module.InvokeVoidAsync("log", "There was an error uploading the file");
+            file = null;
+            Progress = null;
             return;
         }
+
+        // enter filename into database
+        var insertTask = await InsertFileNameIntoDatabase(fileModel);
+        var databaseResult = insertTask;
+        if (databaseResult == false)
+        {
+            await _module.InvokeVoidAsync("log", "There was an inserting the file into the database");
+            file = null;
+            Progress = null;
+
+            return;
+        }
+
+        // send message that file is ready to be transcoded
+        var messageTask = await SendTranscodeMessage();
 
         //// Transcode Message
         var messageResult = messageTask;
         if (messageResult == false)
         {
+            file = null;
+            Progress = null;
             return;
         }
 
