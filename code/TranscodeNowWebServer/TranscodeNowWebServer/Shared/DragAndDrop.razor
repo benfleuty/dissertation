@@ -59,6 +59,18 @@
             </div>
         </div>
     }
+
+    @if (ErrorMessage is not null)
+    {
+        
+        <div class="mt-4 mx-2 bg-danger">
+            <p class="">Something went wrong!</p>
+
+            <div class="error-text">
+                <p>@ErrorMessage</p>
+            </div>
+        </div>
+    }
 </div>
 
 @code {
@@ -70,6 +82,7 @@
 
     bool DisableUploadButton = false;
     string uploadPath = string.Empty;
+    string? ErrorMessage = null;
 
     private int? _progress;
 
@@ -239,6 +252,8 @@
             return;
         }
 
+        ErrorMessage = null;
+
         var newFileName = Path.ChangeExtension(
             Path.GetRandomFileName(),
             Path.GetExtension(file.Name));
@@ -264,6 +279,7 @@
             await _module.InvokeVoidAsync("log", "There was an error uploading the file");
             file = null;
             Progress = null;
+            ErrorMessage = "We could not upload your file";
             return;
         }
 
@@ -275,7 +291,7 @@
             await _module.InvokeVoidAsync("log", "There was an inserting the file into the database");
             file = null;
             Progress = null;
-
+            ErrorMessage = "We could not upload your file";
             return;
         }
 
@@ -288,6 +304,7 @@
         {
             file = null;
             Progress = null;
+            ErrorMessage = "We could not start the transcoder";
             return;
         }
 
