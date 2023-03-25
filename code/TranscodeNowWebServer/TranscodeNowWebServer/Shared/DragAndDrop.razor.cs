@@ -20,6 +20,10 @@ namespace TranscodeNowWebServer.Shared
         string uploadPath = string.Empty;
         string? ErrorMessage = null;
         private int? _progress;
+
+        [Parameter]
+        public EventCallback<IBrowserFile> FileChanged { get; set; }
+
         public int? Progress
         {
             get => _progress;
@@ -45,7 +49,7 @@ namespace TranscodeNowWebServer.Shared
             }
         }
 
-        IBrowserFile? file;
+        public IBrowserFile? file;
         struct MIME
         {
             public string type;
@@ -65,7 +69,7 @@ namespace TranscodeNowWebServer.Shared
         }
 
         MIME uploadedFileMime;
-        void OnChange(InputFileChangeEventArgs e)
+        async void OnChange(InputFileChangeEventArgs e)
         {
             file = null;
             var uploaded = e.File;
@@ -75,6 +79,7 @@ namespace TranscodeNowWebServer.Shared
             uploadedFileMime = new MIME(type, subtype);
             file = uploaded;
             DisableUploadButton = false;
+            await FileChanged.InvokeAsync(file);
         }
 
         async Task<Stream?> GetStreamFromFile()
@@ -228,8 +233,9 @@ namespace TranscodeNowWebServer.Shared
                 return;
             }
 
-            // redirect to transcoding progress page
+            // redirect to transcoding page
             nav.NavigateTo("/transcode");
         }
+
     }
 }

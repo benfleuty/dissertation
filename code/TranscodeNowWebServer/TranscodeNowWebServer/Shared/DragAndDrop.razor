@@ -18,7 +18,7 @@
         <div @ref="@fileUploadControl">
             <p class="upload-step text-center">Step 1</p>
             <label for="fileInput" class="visually-hidden">Choose your file:</label>
-            <InputFile id="fileInput" OnChange="@OnChange" class="form-control" />
+            <InputFile id="fileInput" OnChange="@OnChange" @bind-Value="file" class="form-control" />
             <p class="text-center opacity-75">Or drop a file here</p>
             @if (file is not null)
             {
