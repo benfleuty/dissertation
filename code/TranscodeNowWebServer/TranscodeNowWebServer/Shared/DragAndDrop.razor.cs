@@ -7,6 +7,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using UploadedFilesLibrary;
 using TranscodeNowWebServer.Data;
+using TranscodeNowWebServer.Pages;
 
 namespace TranscodeNowWebServer.Shared
 {
@@ -17,9 +18,13 @@ namespace TranscodeNowWebServer.Shared
         IJSObjectReference? _module;
         IJSObjectReference? _dropZoneInstance;
         bool DisableUploadButton = false;
+        bool DisableInputFile = false;
         string uploadPath = string.Empty;
-        string? ErrorMessage = null;
+        public string? ErrorMessage = null;
         private int? _progress;
+        private InputFile fileInputRef;
+
+        [CascadingParameter] Upload Parent { get; set; }
 
         [Parameter]
         public EventCallback<IBrowserFile> FileChanged { get; set; }
@@ -40,7 +45,7 @@ namespace TranscodeNowWebServer.Shared
                 return;
             _module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/js/dragAndDrop.js") ?? throw new FileNotFoundException("Could not load dragAndDrop.js");
             _dropZoneInstance = await _module.InvokeAsync<IJSObjectReference>("initialiseFileDropZone", dragAndDropContainer, fileUploadControl);
-            uploadPath = $@"{env.WebRootPath}\uploads\";
+            uploadPath = $"{env.WebRootPath}/uploads";
             if (Directory.Exists(uploadPath) == false)
                 Directory.CreateDirectory(uploadPath);
             foreach (string file in Directory.GetFiles(uploadPath))
@@ -72,6 +77,7 @@ namespace TranscodeNowWebServer.Shared
         async void OnChange(InputFileChangeEventArgs e)
         {
             file = null;
+            Progress = null;
             var uploaded = e.File;
             var parts = uploaded.ContentType.Split("/");
             string type = parts[0];
@@ -133,24 +139,43 @@ namespace TranscodeNowWebServer.Shared
                 return false;
             }
 
-            string filePath = $@"{env.WebRootPath}\uploads\{uploadedFileModel.RandomFileName}";
+            string filePath = Path.Combine(uploadPath, uploadedFileModel.RandomFileName);
             FileStream fsW = File.Create(filePath);
+
+
+            long totalBytes = file.Size;
+            long bytesWritten = 0;
+
+            while (bytesWritten < totalBytes)
+            {
+                byte[] buffer = new byte[81920];
+                int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+                if (bytesRead == 0)
+                {
+                    break;
+                }
+
+                await fsW.WriteAsync(buffer, 0, bytesRead);
+                bytesWritten += bytesRead;
+
+                // Calculate the progress percentage
+                Progress = (int)Math.Round((double)bytesWritten / totalBytes * 100);
+            }
             await stream.CopyToAsync(fsW);
             stream.Close();
             fsW.Close();
-            void progress(FtpProgress p)
-            {
-                Progress = (int)p.Progress;
-                Console.WriteLine(Progress);
-            }
+
+            return true;
+
             return await FileUploader.UploadFile(filePath, progress);
+            void progress(FtpProgress p) => Progress = (int)p.Progress;
         }
 
         bool SendTranscodeMessage()
         {
             var factory = new ConnectionFactory()
             {
-                HostName = "localhost"
+                HostName = config["RabbitMQ.IP"]
             };
             using var connection = factory.CreateConnection();
             using var channel = connection.CreateModel();
@@ -174,13 +199,26 @@ namespace TranscodeNowWebServer.Shared
             return true;
         }
 
-        async Task BtnUploadFile()
+        public void DisableUpload()
         {
             DisableUploadButton = true;
+            DisableInputFile = true;
+        }
+
+        public void EnableUpload()
+        {
+            DisableUploadButton = false;
+            DisableInputFile = false;
+        }
+
+        async Task BtnUploadFile()
+        {
+            DisableUpload();
+
             var stream = await GetStreamFromFile();
             if (stream is null || file is null)
             {
-                DisableUploadButton = false;
+                DisableUpload();
                 return;
             }
 
@@ -192,10 +230,10 @@ namespace TranscodeNowWebServer.Shared
                 OriginalFileName = Path.GetFileNameWithoutExtension(file.Name),
                 RandomFileName = newFileName
             };
+
             // upload to fileserver
             var uploadTask = await UploadToFileServer(stream, fileModel);
             var uploadResult = uploadTask;
-            File.Delete(Path.Combine(uploadPath, fileModel.RandomFileName));
             if (uploadResult == false)
             {
                 if (_module is null)
@@ -204,8 +242,11 @@ namespace TranscodeNowWebServer.Shared
                 file = null;
                 Progress = null;
                 ErrorMessage = "We could not upload your file";
+                EnableUpload();
                 return;
             }
+
+            await Parent.OnFileUploaded(Path.Combine(uploadPath,newFileName));
 
             // enter filename into database
             var insertTask = await InsertFileNameIntoDatabase(fileModel);
@@ -218,6 +259,7 @@ namespace TranscodeNowWebServer.Shared
                 file = null;
                 Progress = null;
                 ErrorMessage = "We could not upload your file";
+                EnableUpload() ;
                 return;
             }
 
@@ -230,12 +272,15 @@ namespace TranscodeNowWebServer.Shared
                 file = null;
                 Progress = null;
                 ErrorMessage = "We could not start the transcoder";
+                EnableUpload() ;
                 return;
             }
 
+            File.Delete(Path.Combine(uploadPath, fileModel.RandomFileName));
             // redirect to transcoding page
             nav.NavigateTo("/transcode");
         }
+
 
     }
 }

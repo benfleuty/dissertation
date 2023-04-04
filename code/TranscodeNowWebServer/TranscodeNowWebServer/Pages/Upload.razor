@@ -1,4 +1,4 @@
-﻿@page "/upload"
+﻿@page "/uploa"
 
 <PageTitle>Upload</PageTitle>
 
@@ -7,24 +7,13 @@
 <p class="text-center mx-2">First, we need to know what type of file you are working with. Upload it below:</p>
 
 <div class="d-flex align-items-center justify-content-center">
-    <DragAndDrop @ref="fileUploader" />
+    <CascadingValue Value="this">
+        <DragAndDrop @ref="fileUploader" />
+    </CascadingValue>
 </div>
 
 @if (fileUploader is not null && fileUploader.file is not null)
 {
     <h3>file has been uploaded</h3>
     <button class="btn btn-primary" @onclick="ClearSelectedFile">Clear File</button>
-}
-
-@code {
-    private DragAndDrop? fileUploader;
-
-    void ClearSelectedFile()
-    {
-        if (fileUploader is null)
-            throw new NullReferenceException("File uploader not present");
-
-        fileUploader.file = null;
-    }
-
 }

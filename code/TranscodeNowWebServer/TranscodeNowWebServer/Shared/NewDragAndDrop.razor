@@ -1,0 +1,9 @@
+﻿<link rel="stylesheet" href="css/dragAndDrop.css" />
+
+<div class="drop-zone w-100">
+    <form>
+        <label for="inputUserFile"><span class="visually-hidden">Select a</span> File:</label>
+        <InputFile id="inputUserFile" OnChange="@HandleFileInputChange" @bind-value="UploadedFile" class="form-control" disabled="@Disabled"/>
+        <p class="text-center opacity-75">Alternatively drop a file here</p>
+    </form>
+</div>
