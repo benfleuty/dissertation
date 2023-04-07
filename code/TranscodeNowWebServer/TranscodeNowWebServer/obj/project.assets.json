@@ -59,6 +59,22 @@
           }
         }
       },
+      "Dapper.Contrib/2.0.78": {
+        "type": "package",
+        "dependencies": {
+          "Dapper": "2.0.78"
+        },
+        "compile": {
+          "lib/net5.0/Dapper.Contrib.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net5.0/Dapper.Contrib.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "FFMpegCore/5.1.0": {
         "type": "package",
         "dependencies": {
@@ -1071,6 +1087,23 @@
         "lib/net5.0/Dapper.xml",
         "lib/netstandard2.0/Dapper.dll",
         "lib/netstandard2.0/Dapper.xml"
+      ]
+    },
+    "Dapper.Contrib/2.0.78": {
+      "sha512": "sUfDVIf8LlHNiz3MfUFodeyRiemfN1JFkPxYjCxFWlwNPg1iQ49mB+0E89TkywWs4X8fiRWOVDQgtH5FtzK5Kw==",
+      "type": "package",
+      "path": "dapper.contrib/2.0.78",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "dapper.contrib.2.0.78.nupkg.sha512",
+        "dapper.contrib.nuspec",
+        "lib/net461/Dapper.Contrib.dll",
+        "lib/net461/Dapper.Contrib.xml",
+        "lib/net5.0/Dapper.Contrib.dll",
+        "lib/net5.0/Dapper.Contrib.xml",
+        "lib/netstandard2.0/Dapper.Contrib.dll",
+        "lib/netstandard2.0/Dapper.Contrib.xml"
       ]
     },
     "FFMpegCore/5.1.0": {
@@ -2798,6 +2831,7 @@
   },
   "projectFileDependencyGroups": {
     "net6.0": [
+      "Dapper.Contrib >= 2.0.78",
       "FFMpegCore >= 5.1.0",
       "Microsoft.Extensions.Configuration.UserSecrets >= 7.0.0",
       "Microsoft.VisualStudio.Azure.Containers.Tools.Targets >= 1.17.0",
@@ -2848,6 +2882,10 @@
       "net6.0": {
         "targetAlias": "net6.0",
         "dependencies": {
+          "Dapper.Contrib": {
+            "target": "Package",
+            "version": "[2.0.78, )"
+          },
           "FFMpegCore": {
             "target": "Package",
             "version": "[5.1.0, )"

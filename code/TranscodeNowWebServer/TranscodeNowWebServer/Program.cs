@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using TranscodeNowWebServer.Data;
+using TranscodeNowWebServer.Interfaces;
 using UploadedFilesLibrary;
 
 namespace TranscodeNowWebServer
@@ -17,7 +18,7 @@ namespace TranscodeNowWebServer
             builder.Services.AddSingleton<WeatherForecastService>();
             builder.Services.AddSingleton<ISqlDataAccess, SqlDataAccess>();
             builder.Services.AddTransient<FFMpeg>();
-            builder.Services.AddSingleton<HttpClient>();
+            builder.Services.AddScoped<IUploadedFileService,UploadedFileService>();
 
             var app = builder.Build();
 

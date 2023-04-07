@@ -13,15 +13,13 @@ using Microsoft.AspNetCore.Components.Web.Virtualization;
 using Microsoft.JSInterop;
 using TranscodeNowWebServer;
 using TranscodeNowWebServer.Shared;
-using System.Net.Http;
 using System.IO;
+using TranscodeNowWebServer.Data;
 
 namespace TranscodeNowWebServer.Pages;
 
 public partial class NewUpload
 {
-    private int step = 0;
-    private IBrowserFile? selectedFile;
     private Steps CurrentStep = Steps.GetUserFile;
     private SubSteps CurrentSubStep = SubSteps.None;
     private int? _progress;
@@ -54,26 +52,44 @@ public partial class NewUpload
 
     private async Task OnSelectedFileChange(InputFileChangeEventArgs e)
     {
-        selectedFile = e.File;
+        if (GetFileData(e) == false) { return; }
         await ValidateSelectedFile();
+    }
+
+    private bool GetFileData(InputFileChangeEventArgs e)
+    {
+        if (e.File == null)
+        {
+            return false;
+        }
+
+        var uploadedFile = new UploadedFileModel
+        {
+            OriginalFileName = e.File.Name,
+            RandomFileName = $"{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}{Path.GetExtension(e.File.Name)}",
+            Data = e.File
+        };
+        fileService.UploadedFileModel = uploadedFile;
+        return true;
     }
 
     private async Task ValidateSelectedFile()
     {
         CurrentStep = Steps.VerifyFile;
-        if (selectedFile == null)
+        if (fileService.UploadedFileModel.Data == null)
         {
             Message = "No file given";
             return;
         }
 
 
-        bool successfullyUploaded = await UploadFileAsync(selectedFile);
+        bool successfullyUploaded = await UploadFileAsync(fileService.UploadedFileModel.Data);
 
         if (successfullyUploaded)
         {
             Message = "File uploaded successfully";
-            //CurrentStep = Steps.GetTranscodeOptions;
+            CurrentStep = Steps.GetTranscodeOptions;
+            navManager.NavigateTo("transcode");
         }
         else
         {
@@ -92,12 +108,17 @@ public partial class NewUpload
             return false;
         }
 
-        string filePath = Path.Combine(uploadPath, file.Name);
+        if (fileService.UploadedFileModel.OriginalFileName == null ||
+            fileService.UploadedFileModel.RandomFileName == null ||
+            fileService.UploadedFileModel.Data == null)
+        {
+            return false;
+        }
 
-        var formData = new MultipartFormDataContent();
+        string filePath = Path.Combine(uploadPath, fileService.UploadedFileModel.RandomFileName);
 
         // Create a file stream to read the selected file
-        Stream? streamRead = null;
+        Stream? streamRead;
         try
         {
             streamRead = file.OpenReadStream(file.Size);
@@ -109,7 +130,7 @@ public partial class NewUpload
         }
 
         // Create a file stream to write the selected file to the uploads directory
-        FileStream? fstreamWrite = null;
+        FileStream? fstreamWrite;
         try
         {
             fstreamWrite = File.Create(filePath);
@@ -126,13 +147,13 @@ public partial class NewUpload
         while (bytesWritten < totalBytes)
         {
             byte[] buffer = new byte[81920];
-            int bytesRead = await streamRead.ReadAsync(buffer, 0, buffer.Length);
+            int bytesRead = await streamRead.ReadAsync(buffer);
             if (bytesRead == 0)
             {
                 break;
             }
 
-            await fstreamWrite.WriteAsync(buffer, 0, bytesRead);
+            await fstreamWrite.WriteAsync(buffer.AsMemory(0, bytesRead));
             bytesWritten += bytesRead;
 
             // Calculate the progress percentage

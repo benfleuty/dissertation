@@ -1,6 +1,13 @@
 ﻿@page "/transcode"
+@inject NavigationManager navManager
+@inject Interfaces.IUploadedFileService fileService
 
 <PageTitle>Transcode</PageTitle>
+
+@if (fileService is null)
+{
+    <p>error. fileService is null</p>
+}
 
 <h1 class="text-center">Enter your settings</h1>
 
@@ -8,6 +15,7 @@
 
 @if (FileInfoReady)
 {
+    <p>File Name: @fileService.UploadedFileModel.OriginalFileName / @fileService.UploadedFileModel.RandomFileName </p>
     <div class="d-flex align-items-center justify-content-center">
         <div class="accordion w-100" id="ffmpegAccordion">
             <div class="card">

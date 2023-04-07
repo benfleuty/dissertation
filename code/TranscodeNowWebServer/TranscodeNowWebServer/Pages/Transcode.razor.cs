@@ -27,6 +27,10 @@ public partial class Transcode
 
     protected override async Task OnInitializedAsync()
     {
+        if(fileService.UploadedFileModel is null || fileService.UploadedFileModel.Data is null)
+        {
+            navManager .NavigateTo("transcodenow");
+        }
         FileInfoReady = true;
         Console.WriteLine($"FileInfoReady: {FileInfoReady}");
     }

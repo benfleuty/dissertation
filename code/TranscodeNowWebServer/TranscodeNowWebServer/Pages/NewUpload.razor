@@ -1,7 +1,8 @@
 ﻿@page "/transcodenow"
 @inject UploadedFilesLibrary.FFMpeg ffmpeg
-@inject HttpClient fileUploadClient
+@inject Interfaces.IUploadedFileService fileService
 @inject IWebHostEnvironment env
+@inject NavigationManager navManager
 
 <PageTitle>TranscodeNow</PageTitle>
 

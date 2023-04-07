@@ -24,12 +24,14 @@ public partial class Upload
 {
     private DragAndDrop? fileUploader;
 
-    protected async void OnInitializedAsync()
+    protected async override Task OnInitializedAsync()
     {
         if (fileUploader == null)
         {
             throw new NullReferenceException(nameof(fileUploader));
         }
+
+        return;
     }
 
     void ClearSelectedFile()

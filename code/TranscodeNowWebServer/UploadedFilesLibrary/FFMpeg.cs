@@ -17,8 +17,7 @@ namespace UploadedFilesLibrary
         {
             get
             {
-                if (_details == null)
-                    _details = GetMediaAnalysis();
+                _details ??= GetMediaAnalysis();
 
                 return _details;
             }
@@ -29,7 +28,7 @@ namespace UploadedFilesLibrary
         private IMediaAnalysis? GetMediaAnalysis()
         {
             // Get media information
-            IMediaAnalysis mediaInfo = null;
+            IMediaAnalysis? mediaInfo;
 
 
             if (FilePath == null)
