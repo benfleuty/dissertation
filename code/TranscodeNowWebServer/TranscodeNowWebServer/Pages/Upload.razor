@@ -1,4 +1,4 @@
-﻿@page "/transcodenow"
+﻿@page "/upload"
 @inject UploadedFilesLibrary.FFMpeg ffmpeg
 @inject Interfaces.IUploadedFileService fileService
 @inject IWebHostEnvironment env
@@ -13,7 +13,7 @@
     <p class="text-center mx-2">First, we need to know what type of file you are working with. Upload it below:</p>
 
     <div class="mx-auto w-50 align-itemst-center justify-content-center">
-        <NewDragAndDrop OnChange="OnSelectedFileChange" />
+        <DragAndDrop OnChange="OnSelectedFileChange" />
     </div>
 }
 
