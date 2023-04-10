@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components.Forms;
 using TranscodeNowWebServer.Data;
+using UploadedFilesLibrary;
 
 namespace TranscodeNowWebServer.Pages;
 
@@ -39,7 +40,7 @@ public partial class Upload
     {
         CurrentStep = Steps.VerifyFile;
 
-        var result = GetFileData(e);
+        var result = await GetFileData(e);
         if (result.Item1 == false)
         {
             Message = result.Item2;
@@ -59,8 +60,19 @@ public partial class Upload
             Message = result.Item2;
             return;
         }
+
+        result = await ServersideFileValidation();
+        if (result.Item1 == false)
+        {
+            CurrentStep = Steps.GetUserFile;
+            Message = result.Item2;
+            return;
+        }
+
+
+        navManager.NavigateTo("/transcode");
     }
-    private (bool, string) GetFileData(InputFileChangeEventArgs e)
+    private Task<(bool, string)> GetFileData(InputFileChangeEventArgs e)
     {
         string msg = string.Empty;
         bool success = false;
@@ -68,9 +80,8 @@ public partial class Upload
         {
             msg = "No file has been selected";
             success = false;
-            return (success, msg);
+            return Task.FromResult((success, msg));
         }
-
         var uploadedFile = new UploadedFileModel
         {
             OriginalFileName = e.File.Name,
@@ -79,8 +90,9 @@ public partial class Upload
         };
         fileService.UploadedFileModel = uploadedFile;
         success = true;
-        return (success, msg);
+        return Task.FromResult((success, msg));
     }
+
 
     private Task<(bool, string)> ClientsideFileValidation()
     {
@@ -99,19 +111,19 @@ public partial class Upload
         }
         else success = true;
 
-
         return Task.FromResult((success, msg));
+    }
 
-        bool ValidFileExtension(out string mimeType)
-        {
-            mimeType = fileService.UploadedFileModel.File
-                .ContentType
-                .Split("/")
-                .First()
-                .ToLowerInvariant();
 
-            return mimeType == "audio" || mimeType == "video";
-        }
+    private bool ValidFileExtension(out string mimeType)
+    {
+        mimeType = fileService.UploadedFileModel.File!
+            .ContentType
+            .Split("/")
+            .First()
+            .ToLowerInvariant();
+
+        return mimeType == "audio" || mimeType == "video";
     }
 
     private async Task<(bool, string)> UploadFileAsync()
@@ -212,4 +224,24 @@ public partial class Upload
             return true;
         }
     }
+
+    private Task<(bool, string)> ServersideFileValidation()
+    {
+        string msg = string.Empty;
+        bool success = false;
+
+        var ffmpeg = new FFMpeg(Path.Combine(uploadPath, fileService.UploadedFileModel.RandomFileName!));
+        if (ffmpeg.IsFileSupported() == false)
+        {
+            msg = $"The file you have selected is not supported by our system.";
+            success = false;
+        }
+        else
+        {
+            success = true;
+        }
+
+        return Task.FromResult((success, msg));
+    }
+
 }

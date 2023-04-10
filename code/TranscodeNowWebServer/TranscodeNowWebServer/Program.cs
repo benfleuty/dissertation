@@ -16,7 +16,6 @@ namespace TranscodeNowWebServer
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
             builder.Services.AddSingleton<ISqlDataAccess, SqlDataAccess>();
-            builder.Services.AddTransient<FFMpeg>();
             builder.Services.AddScoped<IUploadedFileService,UploadedFileService>();
 
             var app = builder.Build();

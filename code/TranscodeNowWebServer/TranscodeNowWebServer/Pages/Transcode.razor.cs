@@ -7,11 +7,19 @@ public partial class Transcode
 
     private bool FileInfoReady = false;
 
+    struct Values
+    {
+        public int? ImageHeight { get; set; }
+        public int? ImageWidth { get; set; }
+        public string Extension { get; set; }
+    }
+
     protected override async Task OnInitializedAsync()
     {
         if (fileService.UploadedFileModel is null || fileService.UploadedFileModel.File is null)
         {
-            navManager.NavigateTo("transcodenow");
+            await Console.Out.WriteLineAsync("no file set");
+            return;
         }
         FileInfoReady = true;
         Console.WriteLine($"FileInfoReady: {FileInfoReady}");
@@ -21,6 +29,11 @@ public partial class Transcode
     {
         ImageHeight = height;
         ImageWidth = width;
+    }
+
+    private void SetInitialValues()
+    {
+
     }
 
 

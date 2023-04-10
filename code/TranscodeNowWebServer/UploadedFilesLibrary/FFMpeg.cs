@@ -11,19 +11,13 @@ namespace UploadedFilesLibrary
     public class FFMpeg
     {
         public string? FilePath { get; set; }
-
-        private IMediaAnalysis? _details = null;
-        public IMediaAnalysis? Details
+        public FFMpeg(string filePath)
         {
-            get
-            {
-                _details ??= GetMediaAnalysis();
-
-                return _details;
-            }
-            set { _details = value; }
-
+            FilePath = filePath;
+            GetMediaAnalysis();
         }
+
+        public IMediaAnalysis? Details { get; private set; }
 
         private IMediaAnalysis? GetMediaAnalysis()
         {
@@ -50,13 +44,21 @@ namespace UploadedFilesLibrary
             {
                 return null;
             }
-            
+
+            Details = mediaInfo;
+
             return mediaInfo;
         }
-
-
-        private bool? IsFileSupported(IMediaAnalysis mediaInfo)
+        public bool? IsFileSupported()
         {
+            return IsFileSupported(Details!);
+        }
+
+        public bool? IsFileSupported(IMediaAnalysis mediaInfo)
+        {
+            if (mediaInfo is null)
+                return false;
+
             try
             {
                 return mediaInfo.VideoStreams.Any() || mediaInfo.AudioStreams.Any();
