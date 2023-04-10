@@ -37,81 +37,121 @@ public partial class Upload
 
     private async Task OnSelectedFileChange(InputFileChangeEventArgs e)
     {
-        if (GetFileData(e) == false) { return; }
-        await ValidateSelectedFile();
-    }
+        CurrentStep = Steps.VerifyFile;
 
-    private bool GetFileData(InputFileChangeEventArgs e)
+        var result = GetFileData(e);
+        if (result.Item1 == false)
+        {
+            Message = result.Item2;
+            return;
+        }
+
+        result = await ClientsideFileValidation();
+        if (result.Item1 == false)
+        {
+            Message = result.Item2;
+            return;
+        }
+
+        result = await UploadFileAsync();
+        if (result.Item1 == false)
+        {
+            Message = result.Item2;
+            return;
+        }
+    }
+    private (bool, string) GetFileData(InputFileChangeEventArgs e)
     {
+        string msg = string.Empty;
+        bool success = false;
         if (e.File == null)
         {
-            return false;
+            msg = "No file has been selected";
+            success = false;
+            return (success, msg);
         }
 
         var uploadedFile = new UploadedFileModel
         {
             OriginalFileName = e.File.Name,
             RandomFileName = $"{Path.GetFileNameWithoutExtension(Path.GetRandomFileName())}{Path.GetExtension(e.File.Name)}",
-            Data = e.File
+            File = e.File
         };
         fileService.UploadedFileModel = uploadedFile;
-        return true;
+        success = true;
+        return (success, msg);
     }
 
-    private async Task ValidateSelectedFile()
+    private Task<(bool, string)> ClientsideFileValidation()
     {
-        CurrentStep = Steps.VerifyFile;
-        if (fileService.UploadedFileModel.Data == null)
+        string msg = string.Empty;
+        bool success = false;
+
+        if (fileService.UploadedFileModel.File == null)
         {
-            Message = "No file given";
-            return;
+            msg = "No file given";
+            success = false;
         }
-
-
-        bool successfullyUploaded = await UploadFileAsync(fileService.UploadedFileModel.Data);
-
-        if (successfullyUploaded)
+        else if (ValidFileExtension(out string mimeType) == false)
         {
-            Message = "File uploaded successfully";
-            CurrentStep = Steps.GetTranscodeOptions;
-            navManager.NavigateTo("transcode");
+            msg = $"The file you have selected is not in a supported format.\nYou provided a {mimeType} type file - only audio or video formats are supported.";
+            success = false;
         }
-        else
+        else success = true;
+
+
+        return Task.FromResult((success, msg));
+
+        bool ValidFileExtension(out string mimeType)
         {
-            Message = "File upload failed";
+            mimeType = fileService.UploadedFileModel.File
+                .ContentType
+                .Split("/")
+                .First()
+                .ToLowerInvariant();
+
+            return mimeType == "audio" || mimeType == "video";
         }
     }
 
-
-    private async Task<bool> UploadFileAsync(IBrowserFile file)
+    private async Task<(bool, string)> UploadFileAsync()
     {
+        string msg = "There is a problem on our end and your file cannot be uploaded. Please try again.";
+        bool success = false;
+
         CurrentSubStep = SubSteps.UploadFile;
         uploadPath = $"{env.WebRootPath}/uploads";
 
-        if (!await UploadDirectoryExists(uploadPath))
-        {
-            return false;
-        }
+        success = await UploadDirectoryExistsAsync(uploadPath);
 
-        if (fileService.UploadedFileModel.OriginalFileName == null ||
-            fileService.UploadedFileModel.RandomFileName == null ||
-            fileService.UploadedFileModel.Data == null)
-        {
-            return false;
-        }
+        if (success == false)
+            return (success, msg);
 
-        string filePath = Path.Combine(uploadPath, fileService.UploadedFileModel.RandomFileName);
+        if (fileService.UploadedFileModel == null)
+            return (success, msg);
+
+        var fileModel = fileService.UploadedFileModel;
+        bool hasOriginalFileName = fileModel.OriginalFileName != null;
+        bool hasRandomFileName = fileModel.RandomFileName != null;
+        bool hasFile = fileModel.File != null;
+        success = hasOriginalFileName && hasRandomFileName && hasFile;
+
+        if (success == false)
+            return (success, msg);
+
+
+        string filePath = Path.Combine(uploadPath, fileModel.RandomFileName!);
 
         // Create a file stream to read the selected file
         Stream? streamRead;
         try
         {
-            streamRead = file.OpenReadStream(file.Size);
+            streamRead = fileModel.File!.OpenReadStream(fileModel.File.Size);
         }
         catch (IOException e)
         {
             await Console.Out.WriteLineAsync(e.Message);
-            return false;
+            return (success, msg);
         }
 
         // Create a file stream to write the selected file to the uploads directory
@@ -123,10 +163,10 @@ public partial class Upload
         catch (Exception e)
         {
             await Console.Out.WriteLineAsync(e.Message);
-            return false;
+            return (success, msg);
         }
 
-        long totalBytes = file.Size;
+        long totalBytes = fileModel.File.Size;
         long bytesWritten = 0;
 
         while (bytesWritten < totalBytes)
@@ -149,9 +189,12 @@ public partial class Upload
         streamRead.Close();
         fstreamWrite.Close();
 
-        return File.Exists(filePath);
+        if (File.Exists(filePath) == false)
+            return (success, msg);
 
-        async Task<bool> UploadDirectoryExists(string uploadPath)
+        return (true, string.Empty);
+
+        async Task<bool> UploadDirectoryExistsAsync(string uploadPath)
         {
             if (!Directory.Exists(uploadPath))
             {
