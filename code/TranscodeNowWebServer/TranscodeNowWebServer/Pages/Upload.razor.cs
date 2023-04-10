@@ -68,8 +68,7 @@ public partial class Upload
             Message = result.Item2;
             return;
         }
-
-
+        
         navManager.NavigateTo("/transcode");
     }
     private Task<(bool, string)> GetFileData(InputFileChangeEventArgs e)
@@ -238,6 +237,7 @@ public partial class Upload
         }
         else
         {
+            fileService.UploadedFileModel.Data = ffmpeg.Details;
             success = true;
         }
 

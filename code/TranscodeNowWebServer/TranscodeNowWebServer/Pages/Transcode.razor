@@ -4,30 +4,50 @@
 
 <PageTitle>Transcode</PageTitle>
 
-@if (fileService is null)
+@if (fileService.UploadedFileModel is null)
 {
     <p>error. fileService is null</p>
+    <a href="/upload" class="btn btn-primary">Try again</a>
 }
-
-<h1 class="text-center">Enter your settings</h1>
-
-<p class="text-center mx-2">Now we need to know what you want to do to your file:</p>
-
-@if (FileInfoReady)
+else
 {
-    <p>File Name: @fileService!.UploadedFileModel.OriginalFileName / @fileService.UploadedFileModel.RandomFileName </p>
+    <h1 class="text-center">Enter your settings</h1>
+
+    <p class="text-center mx-2">Now we need to know what you want to do to your file:</p>
+
+    <p>File Name: @fileService.UploadedFileModel.OriginalFileName / @fileService.UploadedFileModel.RandomFileName </p>
+    <div>
+        @if (InitialAudioStreams is not null)
+        {
+            foreach (var audioStream in InitialAudioStreams)
+            {
+                <p>Duration: @audioStream.Duration</p>
+                <p>Bitrate: @audioStream.BitRate</p>
+            }
+        }
+    </div>
+    <div>
+        @if (InitialVideoStreams is not null)
+        {
+            foreach (var videoStream in InitialVideoStreams)
+            {
+                <p>Duration: @videoStream.Duration</p>
+                <p>Bitrate: @videoStream.BitRate</p>
+            }
+        }
+    </div>
     <div class="d-flex align-items-center justify-content-center">
         <div class="accordion w-100" id="ffmpegAccordion">
             <div class="card">
                 <div class="card-header" id="userOptions">
                     <h5 class="mb-0">
-                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#userOptionsCollapse" aria-expanded="true" aria-controls="resizeCollapse">
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#userOptionsCollapse" aria-controls="resizeCollapse">
                             Your Settings
                         </button>
                     </h5>
                 </div>
 
-                <div id="userOptionsCollapse" class="collapse show" aria-labelledby="resizeHeading" data-parent="#ffmpegAccordion">
+                <div id="userOptionsCollapse" class="collapse" aria-labelledby="resizeHeading" data-parent="#ffmpegAccordion">
                     <div class="card-body">
                         <div>
                             <p>
@@ -47,13 +67,13 @@
                 <div class="card">
                     <div class="card-header" id="resizeHeading">
                         <h5 class="mb-0">
-                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#resizeCollapse" aria-expanded="true" aria-controls="resizeCollapse">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#resizeCollapse" aria-controls="resizeCollapse">
                                 Resize Video
                             </button>
                         </h5>
                     </div>
 
-                    <div id="resizeCollapse" class="collapse show" aria-labelledby="resizeHeading" data-parent="#ffmpegAccordion">
+                    <div id="resizeCollapse" class="collapse" aria-labelledby="resizeHeading" data-parent="#ffmpegAccordion">
                         <div class="card-body">
                             <div>
                                 <label for="image-height">Image Height:</label>
@@ -111,10 +131,3 @@
     </div>
 }
 
-
-else
-{
-    <div class="alert alert-info" role="alert">
-        <p class="mb-0">Please wait while we fetch information about your uploaded video or audio file...</p>
-    </div>
-}
