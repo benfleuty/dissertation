@@ -15,7 +15,6 @@ namespace TranscodeNowWebServer
             // Add services to the container.
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
-            builder.Services.AddSingleton<WeatherForecastService>();
             builder.Services.AddSingleton<ISqlDataAccess, SqlDataAccess>();
             builder.Services.AddTransient<FFMpeg>();
             builder.Services.AddScoped<IUploadedFileService,UploadedFileService>();
