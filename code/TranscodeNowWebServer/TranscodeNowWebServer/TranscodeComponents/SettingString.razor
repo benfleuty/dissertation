@@ -1,0 +1,84 @@
+﻿<div>
+    @ParameterName: <input type="text" @bind="InputValue" @bind:event="oninput" />
+</div>
+
+@code {
+    [Parameter]
+    public string ParameterName { get; set; }
+
+    [Parameter]
+    public bool AllowAlpha { get; set; } = true;
+
+    [Parameter]
+    public bool AllowNumeric { get; set; } = true;
+
+    [Parameter]
+    public bool AllowSymbols { get; set; } = true;
+
+    private string inputValue;
+    public string InputValue
+    {
+        get => inputValue;
+        set
+        {
+            if (IsValidInput(value))
+            {
+                OutputValue = value;
+                inputValue = value;
+            }
+        }
+    }
+
+    private string outputValue;
+    [Parameter]
+    public string OutputValue
+    {
+        get => outputValue;
+        set
+        {
+            if (outputValue != value)
+            {
+                outputValue = value;
+                OutputValueChanged.InvokeAsync(outputValue);
+            }
+        }
+    }
+
+    [Parameter]
+    public EventCallback<string> OutputValueChanged { get; set; }
+
+    private bool IsValidInput(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return true;
+        }
+
+        bool isAlpha, isNumeric, isSymbol, isPunctuation;
+        foreach (char c in value)
+        {
+            isAlpha = char.IsLetter(c);
+            isNumeric = char.IsDigit(c);
+            isSymbol = char.IsSymbol(c);
+            isPunctuation = char.IsPunctuation(c);
+
+            if (isAlpha && !AllowAlpha)
+            {
+                return false;
+            }
+
+            if (isNumeric && !AllowNumeric)
+            {
+                return false;
+            }
+
+            if ((isSymbol || isPunctuation) && !AllowSymbols)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+}
