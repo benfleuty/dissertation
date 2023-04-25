@@ -1,5 +1,8 @@
 ﻿<div>
-    @ParameterName: <input type="text" @bind="InputValue" @bind:event="oninput" />
+    <label for="@ParameterNameToLabelFor(ParameterName)">
+        @ParameterName:
+    </label>
+    <input type="text" @bind="InputValue" @bind:event="oninput" />
 </div>
 
 @code {
@@ -16,6 +19,8 @@
     public bool AllowSymbols { get; set; } = true;
 
     private string inputValue;
+
+    [Parameter]
     public string InputValue
     {
         get => inputValue;
@@ -43,6 +48,9 @@
             }
         }
     }
+
+    private string ParameterNameToLabelFor(string parameterName) =>
+        parameterName.Replace(" ", "-").ToLowerInvariant();
 
     [Parameter]
     public EventCallback<string> OutputValueChanged { get; set; }
