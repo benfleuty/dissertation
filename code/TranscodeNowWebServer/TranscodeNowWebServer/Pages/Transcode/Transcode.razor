@@ -1,0 +1,132 @@
+﻿@page "/transcode"
+@using TranscodeNowWebServer.TranscodeComponents
+@inject IJSRuntime JSRuntime;
+@inject NavigationManager navManager
+@inject Interfaces.IUploadedFileService fileService
+
+<PageTitle>Transcode</PageTitle>
+
+@if (fileService.UploadedFileModel is null)
+{
+    <p>error. fileService is null</p>
+    <a href="/upload" class="btn btn-primary">Try again</a>
+}
+else
+{
+    <h1 class="text-center">Enter your settings</h1>
+    <p class="text-center mx-2">Now we need to know what you want to do to your file:</p>
+
+    <p>File Name: @fileService.UploadedFileModel.OriginalFileName / @fileService.UploadedFileModel.RandomFileName </p>
+    <div>
+        <button @onclick="OnButtonClick">Click Me</button>
+    </div>
+    <div class="d-flex align-items-center justify-content-center">
+        <div class="accordion w-100" id="ffmpegAccordion">
+            <div class="card">
+                <div class="card-header" id="userOptions">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#userOptionsCollapse" aria-controls="resizeCollapse">
+                            Your Settings
+                        </button>
+                    </h5>
+                </div>
+                <div id="userOptionsCollapse" class="collapse" aria-labelledby="resizeHeading" data-parent="#ffmpegAccordion">
+                    <div class="card-body">
+                        <div>
+                            <p>
+                                This section contains all the settings that you have selected.
+                            </p>
+                        </div>
+                        <div>
+                            <SettingString ParameterName="Video Width"
+                                       OutputValueChanged="@HandleVideoWidthChange"
+                                       AllowAlpha="false"
+                                       AllowNumeric="true"
+                                       AllowSymbols="false"
+                                       InputValue="@ImageWidth.ToString()" />
+
+                        </div>
+                        <div>
+                            <SettingString ParameterName="Video Height"
+                                       OutputValueChanged="@HandleVideoHeightChange"
+                                       AllowAlpha="false"
+                                       AllowNumeric="true"
+                                       AllowSymbols="false"
+                                       InputValue="@ImageHeight.ToString()" />
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header" id="resizeHeading">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#resizeCollapse" aria-controls="resizeCollapse">
+                                Resize Video
+                            </button>
+                        </h5>
+                    </div>
+
+                    <div id="resizeCollapse" class="collapse" aria-labelledby="resizeHeading" data-parent="#ffmpegAccordion">
+                        <div class="card-body">
+                            <div>
+                                <SettingString ParameterName="Video Width"
+                                           OutputValueChanged="@HandleVideoWidthChange"
+                                           AllowAlpha="false"
+                                           AllowNumeric="true"
+                                           AllowSymbols="false"
+                                           InputValue="@ImageWidth.ToString()" />
+
+                            </div>
+                            <div>
+                                <SettingString ParameterName="Video Height"
+                                           OutputValueChanged="@HandleVideoHeightChange"
+                                           AllowAlpha="false"
+                                           AllowNumeric="true"
+                                           AllowSymbols="false"
+                                           InputValue="@ImageHeight.ToString()" />
+                            </div>
+                            <div class="d-flex flex-wrap">
+                                <button class="btn btn-outline-primary me-3 mb-3" @onclick="() => SetImageResolution(1280, 720)">HD 720p</button>
+                                <button class="btn btn-outline-primary me-3 mb-3" @onclick="() => SetImageResolution(1920, 1080)">FHD 1080p</button>
+                                <button class="btn btn-outline-primary me-3 mb-3" @onclick="() => SetImageResolution(3840, 2160)">4K 2160p</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header" id="audioHeading">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#audioCollapse" aria-expanded="true" aria-controls="audioCollapse">
+                            Extract Audio
+                        </button>
+                    </h5>
+                </div>
+
+                <div id="audioCollapse" class="collapse" aria-labelledby="audioHeading" data-parent="#ffmpegAccordion">
+                    <div class="card-body">
+                        <p>To extract audio from a video, use the following command:</p>
+                        <code>ffmpeg -i input.mp4 -vn -acodec copy output.aac</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header" id="watermarkHeading">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#watermarkCollapse" aria-expanded="true" aria-controls="watermarkCollapse">
+                            Add Watermark
+                        </button>
+                    </h5>
+                </div>
+
+                <div id="watermarkCollapse" class="collapse" aria-labelledby="watermarkHeading" data-parent="#ffmpegAccordion">
+                    <div class="card-body">
+                        <p>To add a watermark to a video, use the following command:</p>
+                        <code>ffmpeg -i input.mp4 -i watermark.png -filter_complex "overlay=10:10" output.mp4</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
