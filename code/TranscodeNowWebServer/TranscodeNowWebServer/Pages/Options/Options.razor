@@ -1,10 +1,11 @@
-﻿@page "/transcode"
+﻿@page "/options"
 @using TranscodeNowWebServer.TranscodeComponents
 @inject IJSRuntime JSRuntime;
 @inject NavigationManager navManager
 @inject Interfaces.IUploadedFileService fileService
+@inject Interfaces.IUserOptions userOptionsService
 
-<PageTitle>Transcode</PageTitle>
+<PageTitle>Options</PageTitle>
 
 @if (fileService.UploadedFileModel is null)
 {

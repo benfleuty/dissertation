@@ -69,7 +69,7 @@ public partial class Upload
             return;
         }
         
-        navManager.NavigateTo("/transcode");
+        navManager.NavigateTo("/options");
     }
     private Task<(bool, string)> GetFileData(InputFileChangeEventArgs e)
     {

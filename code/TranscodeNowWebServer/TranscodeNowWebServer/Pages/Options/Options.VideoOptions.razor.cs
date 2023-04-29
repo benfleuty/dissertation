@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
 
-namespace TranscodeNowWebServer.Pages.Transcode;
+namespace TranscodeNowWebServer.Pages.Options;
 
-public partial class Transcode
+public partial class Options
 {
     private int? _imageHeight = null;
     private int? _imageWidth = null;

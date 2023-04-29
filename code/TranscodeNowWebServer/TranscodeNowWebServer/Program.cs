@@ -17,6 +17,7 @@ namespace TranscodeNowWebServer
             builder.Services.AddServerSideBlazor();
             builder.Services.AddSingleton<ISqlDataAccess, SqlDataAccess>();
             builder.Services.AddScoped<IUploadedFileService,UploadedFileService>();
+            builder.Services.AddScoped<IUserOptions, UserOptionsService>();
 
             var app = builder.Build();
 
