@@ -1,4 +1,6 @@
+using FluentFTP;
 using Microsoft.AspNetCore.Components.Forms;
+using System.Runtime.CompilerServices;
 using TranscodeNowWebServer.Data;
 using UploadedFilesLibrary;
 
@@ -68,9 +70,34 @@ public partial class Upload
             Message = result.Item2;
             return;
         }
-        
+
+        result = await UploadToFileserver();
+        if (result.Item1 == false)
+        {
+            CurrentStep = Steps.GetUserFile;
+            Message = result.Item2;
+            return;
+        }
+
         navManager.NavigateTo("/options");
     }
+
+    private async Task<(bool, string)> UploadToFileserver()
+    {
+        var fileName = Path.Combine(uploadPath,fileService.UploadedFileModel.RandomFileName);
+        bool result = await FileUploader.UploadFile(fileName, ProgressHandler);
+        if (result == false)
+        {
+            CurrentStep = Steps.GetUserFile;
+            var msg = "There is a problem on our end and your file cannot be uploaded. Please try again.";
+            return (result,msg);
+        }
+
+        return (result, string.Empty);
+    }
+
+    private void ProgressHandler(FtpProgress progress) => Progress = (int?)(progress.Progress / 2) + 50;
+
     private Task<(bool, string)> GetFileData(InputFileChangeEventArgs e)
     {
         string msg = string.Empty;
@@ -91,7 +118,6 @@ public partial class Upload
         success = true;
         return Task.FromResult((success, msg));
     }
-
 
     private Task<(bool, string)> ClientsideFileValidation()
     {
@@ -193,7 +219,7 @@ public partial class Upload
             bytesWritten += bytesRead;
 
             // Calculate the progress percentage
-            Progress = (int)Math.Round((double)bytesWritten / totalBytes * 100);
+            Progress = (int)Math.Round((double)bytesWritten / totalBytes * 50);
         }
 
         await streamRead.CopyToAsync(fstreamWrite);
