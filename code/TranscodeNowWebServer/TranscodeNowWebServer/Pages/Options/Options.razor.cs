@@ -2,9 +2,13 @@ using FFMpegCore;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Microsoft.VisualBasic;
+using RabbitMQ.Client;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text.Json;
+using System.Text;
 using TranscodeNowWebServer.Data;
+using System.ComponentModel.DataAnnotations;
 
 namespace TranscodeNowWebServer.Pages.Options;
 
@@ -126,22 +130,40 @@ public partial class Options
         }
     }
 
-    private async void OnButtonClick()
+    private void OnButtonClick()
     {
         if (InitialVideoStream is null && InitialAudioStream is null) return;
 
         if (!IsChangesMade()) return;
 
-        userOptionsService.UserOptions = GetSelectedOptions(InitialVideoStream is not null, InitialAudioStream is not null);
+        userOptionsService.UserOptions =
+            GetSelectedOptions(InitialVideoStream is not null, InitialAudioStream is not null);
 
+        var msg = new MqqtTranscodeMessage(
+            fileService.UploadedFileModel,
+            userOptionsService.UserOptions
+            );
+
+        SendTranscodeMessage(msg);
         navManager.NavigateTo("transcode");
+    }
+
+    private void SendTranscodeMessage(MqqtTranscodeMessage msg)
+    {
+        var factory = new ConnectionFactory() { HostName = "172.18.0.3" };
+        using var connection = factory.CreateConnection();
+        using var channel = connection.CreateModel();
+        string queueName = "transcode-in";
+        string message = JsonSerializer.Serialize(msg);
+        var body = Encoding.UTF8.GetBytes(message);
+        channel.BasicPublish(exchange: "", routingKey: queueName, basicProperties: null, body: body);
     }
 
     private UserOptions GetSelectedOptions(bool hasVideo, bool hasAudio)
     {
         var message = new UserOptions();
-        if(hasVideo) GetVideoOptions(ref message);
-        if(hasAudio) GetAudioOptions(ref message);
+        if (hasVideo) GetVideoOptions(ref message);
+        if (hasAudio) GetAudioOptions(ref message);
         return message;
     }
 

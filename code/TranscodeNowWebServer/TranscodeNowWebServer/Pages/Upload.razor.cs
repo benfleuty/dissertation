@@ -1,8 +1,11 @@
 using FluentFTP;
 using Microsoft.AspNetCore.Components.Forms;
+using RabbitMQ.Client;
 using System.Runtime.CompilerServices;
+using System.Text;
 using TranscodeNowWebServer.Data;
 using UploadedFilesLibrary;
+using System.Text.Json;
 
 namespace TranscodeNowWebServer.Pages;
 
@@ -82,15 +85,16 @@ public partial class Upload
         navManager.NavigateTo("/options");
     }
 
+
     private async Task<(bool, string)> UploadToFileserver()
     {
-        var fileName = Path.Combine(uploadPath,fileService.UploadedFileModel.RandomFileName);
+        var fileName = Path.Combine(uploadPath, fileService.UploadedFileModel.RandomFileName);
         bool result = await FileUploader.UploadFile(fileName, ProgressHandler);
         if (result == false)
         {
             CurrentStep = Steps.GetUserFile;
             var msg = "There is a problem on our end and your file cannot be uploaded. Please try again.";
-            return (result,msg);
+            return (result, msg);
         }
 
         return (result, string.Empty);
