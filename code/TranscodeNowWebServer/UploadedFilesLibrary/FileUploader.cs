@@ -15,7 +15,7 @@ public class FileUploader
 
         var config = builder.Build();
 
-        string url = "172.18.0.4";
+        string url = "172.18.0.2";
         string username = config["FtpUserName"]
             ?? throw new NullReferenceException();
         string password = config["FtpPassword"]
