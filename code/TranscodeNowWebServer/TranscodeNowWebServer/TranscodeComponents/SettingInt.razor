@@ -1,0 +1,40 @@
+﻿<div>
+    @ParameterName: <input type="text" @bind="InputValue" @bind:event="oninput" />
+</div>
+
+@code {
+    [Parameter]
+    public string ParameterName { get; set; }
+
+    private string inputValue;
+    public string InputValue
+    {
+        get => inputValue;
+        set
+        {
+            if (int.TryParse(value, out int result))
+            {
+                OutputValue = result;
+                inputValue = value;
+            }
+        }
+    }
+
+    private int outputValue;
+    [Parameter]
+    public int OutputValue
+    {
+        get => outputValue;
+        set
+        {
+            if (outputValue != value)
+            {
+                outputValue = value;
+                OutputValueChanged.InvokeAsync(outputValue);
+            }
+        }
+    }
+
+    [Parameter]
+    public EventCallback<int> OutputValueChanged { get; set; }
+}

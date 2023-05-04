@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using TranscodeNowWebServer.Data;
+using TranscodeNowWebServer.Interfaces;
 using UploadedFilesLibrary;
 
 namespace TranscodeNowWebServer
@@ -14,10 +15,11 @@ namespace TranscodeNowWebServer
             // Add services to the container.
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
-            builder.Services.AddSingleton<WeatherForecastService>();
-			builder.Services.AddSingleton<ISqlDataAccess, SqlDataAccess>();
+            builder.Services.AddSingleton<ISqlDataAccess, SqlDataAccess>();
+            builder.Services.AddScoped<IUploadedFileService,UploadedFileService>();
+            builder.Services.AddScoped<IUserOptions, UserOptionsService>();
 
-			var app = builder.Build();
+            var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

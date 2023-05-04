@@ -4,10 +4,8 @@
 *.mkv
 transcode-server/txt
 
-
-
 **/*/wwwroot/uploads
-
+**/*/obj/
 
 
 ## Ignore Visual Studio temporary files, build results, and

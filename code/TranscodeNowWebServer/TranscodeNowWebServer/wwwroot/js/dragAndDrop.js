@@ -53,4 +53,3 @@ export function clearUploadControl(fileUploadControl) {
 export function log(data) {
     console.log(data);
 }
-
