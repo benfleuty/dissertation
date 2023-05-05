@@ -1,11 +1,8 @@
 using FluentFTP;
 using Microsoft.AspNetCore.Components.Forms;
-using RabbitMQ.Client;
-using System.Runtime.CompilerServices;
-using System.Text;
+using Microsoft.JSInterop;
 using TranscodeNowWebServer.Data;
 using UploadedFilesLibrary;
-using System.Text.Json;
 
 namespace TranscodeNowWebServer.Pages;
 
@@ -81,6 +78,8 @@ public partial class Upload
             Message = result.Item2;
             return;
         }
+
+        await jsRuntime.InvokeVoidAsync("document.cookie", $"filename={fileService.UploadedFileModel.RandomFileName};path=/");
 
         navManager.NavigateTo("/options");
     }

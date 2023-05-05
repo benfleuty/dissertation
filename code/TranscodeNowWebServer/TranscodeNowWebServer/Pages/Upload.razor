@@ -1,9 +1,9 @@
 ﻿@page "/upload"
 @using UploadedFilesLibrary;
+@inject IJSRuntime jsRuntime
 @inject Interfaces.IUploadedFileService fileService
 @inject IWebHostEnvironment env
 @inject NavigationManager navManager
-@inject ISqlDataAccess db
 
 <PageTitle>TranscodeNow</PageTitle>
 
