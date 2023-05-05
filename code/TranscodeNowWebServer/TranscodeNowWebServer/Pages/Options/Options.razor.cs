@@ -145,12 +145,12 @@ public partial class Options
             );
 
         SendTranscodeMessage(msg);
-        navManager.NavigateTo("transcode");
+        navManager.NavigateTo("result");
     }
 
     private void SendTranscodeMessage(MqqtTranscodeMessage msg)
     {
-        var factory = new ConnectionFactory() { HostName = "172.18.0.3" };
+        var factory = new ConnectionFactory() { HostName = "rabbitmq" };
         using var connection = factory.CreateConnection();
         using var channel = connection.CreateModel();
         string queueName = "transcode-in";

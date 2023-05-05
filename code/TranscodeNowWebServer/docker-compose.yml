@@ -1,0 +1,36 @@
+version: '3.4'
+
+services:
+  fileserver:
+    image: ${DOCKER_REGISTRY-}fileserver
+    container_name: fileserver
+    ports:
+      - "20:20"
+      - "21:21"
+      - "21100-21110:21100-21110"
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+      
+  transcodenowwebserver:
+    image: ${DOCKER_REGISTRY-}transcodenowwebserver
+    build:
+      context: .
+      dockerfile: TranscodeNowWebServer/Dockerfile
+    container_name: webserver
+    ports:
+      - "80:80"
+      - "443:443"
+
+  transcoder:
+    build:
+      context: ../../transcode-server/TranscodeServerApp
+      dockerfile: Dockerfile
+    container_name: transcoder

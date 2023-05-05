@@ -15,13 +15,13 @@ public class FileUploader
 
         var config = builder.Build();
 
-        string url = "172.18.0.2";
+        string url = "fileserver";
         string username = config["FtpUserName"]
             ?? throw new NullReferenceException();
         string password = config["FtpPassword"]
             ?? throw new NullReferenceException();
         var creds = new NetworkCredential(username, password);
-
+        Console.WriteLine($"u:{username} p:{password}") ;
         return new FtpClient(url, creds);
     }
 
