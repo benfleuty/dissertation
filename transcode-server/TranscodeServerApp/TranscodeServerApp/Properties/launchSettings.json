@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "TranscodeServerApp": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

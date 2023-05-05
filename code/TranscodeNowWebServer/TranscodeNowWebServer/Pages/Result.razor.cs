@@ -16,11 +16,10 @@ using TranscodeNowWebServer.Shared;
 
 namespace TranscodeNowWebServer.Pages;
 
-public partial class Transcode
+public partial class Result
 {
-    protected override Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-
-        return base.OnInitializedAsync();
+        base.OnInitialized();
     }
 }
