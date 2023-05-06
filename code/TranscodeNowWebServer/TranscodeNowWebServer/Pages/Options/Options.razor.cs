@@ -33,7 +33,6 @@ public partial class Options
 
     private void SetInitialValues()
     {
-        Console.WriteLine("setting initial values");
         var file = fileService.UploadedFileModel.Data!;
         bool hasVideo = file.VideoStreams.Any();
         bool hasAudio = file.AudioStreams.Any();
@@ -91,19 +90,6 @@ public partial class Options
         {
             // no valid streams
             return;
-        }
-        Console.WriteLine("set initial values");
-
-    }
-
-    private int test;
-
-    public int Test
-    {
-        get => test; set
-        {
-            test = value;
-            StateHasChanged();
         }
     }
 

@@ -1,5 +1,8 @@
 ﻿@page "/result"
-
+@using TranscodeNowWebServer.Interfaces
+@inject IJSRuntime jsRuntime
+@inject IHttpContextAccessor HttpContextAccessor
+@inject IUploadedFileService UploadedFileService
+@inject IWebHostEnvironment env
+@inject NavigationManager nav
 <h3>Result</h3>
-
-

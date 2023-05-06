@@ -15,6 +15,8 @@ namespace TranscodeNowWebServer
             builder.Services.AddScoped<IUploadedFileService,UploadedFileService>();
             builder.Services.AddScoped<IUserOptions, UserOptionsService>();
 
+            builder.Services.AddHttpContextAccessor();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

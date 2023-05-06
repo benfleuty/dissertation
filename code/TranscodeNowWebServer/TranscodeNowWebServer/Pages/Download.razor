@@ -1,0 +1,11 @@
+﻿@page "/download"
+@using TranscodeNowWebServer.Interfaces
+@inject IWebHostEnvironment env
+@inject IUploadedFileService fileService
+@inject IJSRuntime js
+<h3>Download</h3>
+<button class="btn btn-primary" @onclick="DownloadFileFromURL">
+    Download File From URL
+</button>
+
+

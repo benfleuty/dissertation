@@ -21,7 +21,6 @@ public class FileUploader
         string password = config["FtpPassword"]
             ?? throw new NullReferenceException();
         var creds = new NetworkCredential(username, password);
-        Console.WriteLine($"u:{username} p:{password}") ;
         return new FtpClient(url, creds);
     }
 
@@ -29,7 +28,6 @@ public class FileUploader
     {
         using var ftp = CreateFtpClient();
         ftp.AutoConnect();
-        await Console.Out.WriteLineAsync("connected");
         var status = ftp.UploadFile(path,
                                     Path.GetFileName(path),
                                     default,
@@ -37,6 +35,28 @@ public class FileUploader
                                     default,
                                     progress);
 
+        return status == FtpStatus.Success;
+    }
+
+
+    public static bool DownloadFile(string fileName, string destPath)
+    {
+        using var ftp = CreateFtpClient();
+        ftp.AutoConnect();
+        FtpStatus status;
+        try
+        {
+            status = ftp.DownloadFile(destPath,
+                                        fileName,
+                                        default,
+                                        default,
+                                        default);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return false;
+        }
         return status == FtpStatus.Success;
     }
 

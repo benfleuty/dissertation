@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using System.Threading.Channels;
 using FluentFTP.Helpers;
 using System.Reflection;
+using TranscodeServerApp;
+using RabbitMQ.Client.Exceptions;
 
 internal class Program
 {
@@ -28,6 +30,7 @@ internal class Program
 
                 var consumer = new EventingBasicConsumer(channel);
                 consumer.Received += HandleMessage;
+                channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false);
                 channel.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
                 while (true)
                 {
@@ -101,10 +104,10 @@ internal class Program
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
         // Start the process and wait for it to complete
-        Console.WriteLine($"Start transcode {fileName} to {fileName}_transcoded using\n{process.StartInfo.FileName} {process.StartInfo.Arguments}");
+        Console.WriteLine($"Start transcode {fileName} to {GetOutputFileName(fileName)} using\n{process.StartInfo.FileName} {process.StartInfo.Arguments}");
         process.Start();
         process.WaitForExit();
-        Console.WriteLine($"Transcoded {fileName} to {fileName}_transcoded");
+        Console.WriteLine($"Transcoded {fileName} to {GetOutputFileName(fileName)}");
 
 
         // Print the output of ffmpeg to the console
@@ -125,9 +128,34 @@ internal class Program
 
         Console.WriteLine("Uploading transcoded file");
         string outFileName = GetOutputFileName(fileName);
+        MqqtTranscodedMessage msg = new();
+        msg.OriginalFileName = fileName;
+        msg.NewFileName = outFileName;
+        msg.State = "Success";
         if (!UploadFile(outFileName))
         {
             Console.WriteLine($"Failed to upload file {outFileName}");
+            msg.State = "Failed";
+            msg.Message = "Failed to upload file";
+        }
+
+        try
+        {
+            var factory = new ConnectionFactory() { HostName = "rabbitmq" };
+            using var connection = factory.CreateConnection();
+            using var channel = connection.CreateModel();
+
+            string queueName = fileName;
+            var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(msg));
+
+            var arguments = new Dictionary<string, object> { { "x-expires", 100 * 60 * 60 * 24 } };
+            channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: arguments);
+
+            channel.BasicPublish(exchange: "", routingKey: queueName, body: body);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"{Now} Error: {ex.Message}\nFailed to send transcode result to rabbitmq.");
         }
 
         Console.WriteLine("finished");
@@ -157,15 +185,14 @@ internal class Program
             commandParts.Add($"-vf scale={options.Width}:{options.Height}");
         }
 
-        // output file name as the currentName_transcoded
+        // output file name as last parameter
         string outputFileName = GetOutputFileName(model.RandomFileName);
-        commandParts.Add(outputFileName);   
+        commandParts.Add(outputFileName);
 
         return string.Join(" ", commandParts);
     }
 
-    static string GetOutputFileName(string fileName) => Path.GetFileNameWithoutExtension(fileName) +
-        "_transcoded" + Path.GetExtension(fileName);
+    static string GetOutputFileName(string fileName) => "transcoded_" + fileName;
 
     private static FtpClient CreateFtpClient()
     {

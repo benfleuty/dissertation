@@ -79,7 +79,13 @@ public partial class Upload
             return;
         }
 
-        await jsRuntime.InvokeVoidAsync("document.cookie", $"filename={fileService.UploadedFileModel.RandomFileName};path=/");
+        var func = "setCookie";
+        var cookieName = "fileName";
+        var cookieValue = fileService.UploadedFileModel.RandomFileName;
+        var cookiePath = "/";
+        var cookieExpires = DateTime.UtcNow.AddHours(1).ToString();
+
+        await jsRuntime.InvokeVoidAsync(func, cookieName, cookieValue, cookiePath, cookieExpires);
 
         navManager.NavigateTo("/options");
     }

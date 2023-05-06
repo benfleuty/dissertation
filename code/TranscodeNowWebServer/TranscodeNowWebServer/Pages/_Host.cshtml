@@ -10,3 +10,33 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="@Html.Raw("https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js")"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+<script>
+    function setCookie(name, value, path, expires) {
+        document.cookie = name + "=" + value + "; path=" + path + "; expires=" + expires;
+    }
+
+    function getFileNameCookie() {
+        const getCookie = (name) => {
+            const cookieString = document.cookie;
+            const cookies = cookieString.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Check if this cookie contains the name we're looking for
+                if (cookie.startsWith(name + '=')) {
+                    // If it does, return the cookie value
+                    return cookie.substring(name.length + 1);
+                }
+            }
+            // If we don't find the cookie, return null
+            return null;
+        };
+    }
+
+    window.triggerFileDownload = (fileName, url) => {
+        const anchorElement = document.createElement('a');
+        anchorElement.href = url;
+        anchorElement.download = fileName ?? '';
+        anchorElement.click();
+        anchorElement.remove();
+    }
+</script>
