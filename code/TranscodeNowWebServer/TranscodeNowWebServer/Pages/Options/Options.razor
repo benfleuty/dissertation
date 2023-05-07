@@ -1,6 +1,5 @@
 ﻿@page "/options"
 @using TranscodeNowWebServer.TranscodeComponents
-@inject IJSRuntime JSRuntime;
 @inject NavigationManager navManager
 @inject Interfaces.IUploadedFileService fileService
 @inject Interfaces.IUserOptions userOptionsService
@@ -23,13 +22,12 @@ else
     </div>
     <div class="d-flex align-items-center justify-content-center">
         <div class="accordion w-100" id="ffmpegAccordion">
+            <!-- Selected Options -->
             <div class="card">
                 <div class="card-header" id="userOptions">
-                    <h5 class="mb-0">
-                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#userOptionsCollapse" aria-controls="resizeCollapse">
-                            Your Settings
-                        </button>
-                    </h5>
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#userOptionsCollapse" aria-controls="resizeCollapse">
+                        Your Selected Settings
+                    </button>
                 </div>
                 <div id="userOptionsCollapse" class="collapse" aria-labelledby="resizeHeading" data-parent="#ffmpegAccordion">
                     <div class="card-body">
@@ -39,56 +37,106 @@ else
                             </p>
                         </div>
                         <div>
-                            <SettingString ParameterName="Video Width"
-                                       OutputValueChanged="@HandleVideoWidthChange"
-                                       AllowAlpha="false"
-                                       AllowNumeric="true"
-                                       AllowSymbols="false"
-                                       InputValue="@ImageWidth.ToString()" />
-
+                            <SettingInput ParameterId="video-width"
+                                      Unit="px"
+                                      AllowAlpha="false"
+                                      AllowNumeric="true"
+                                      AllowSymbols="false"
+                                      OutputValueChanged="@HandleVideoWidthChange" />
                         </div>
                         <div>
-                            <SettingString ParameterName="Video Height"
-                                       OutputValueChanged="@HandleVideoHeightChange"
-                                       AllowAlpha="false"
-                                       AllowNumeric="true"
-                                       AllowSymbols="false"
-                                       InputValue="@ImageHeight.ToString()" />
+                            <SettingInput ParameterId="video-height"
+                                      Unit="px"
+                                      AllowAlpha="false"
+                                      AllowNumeric="true"
+                                      AllowSymbols="false"
+                                      OutputValueChanged="@HandleVideoHeightChange" />
                         </div>
                     </div>
                 </div>
-                <div class="card">
-                    <div class="card-header" id="resizeHeading">
-                        <h5 class="mb-0">
-                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#resizeCollapse" aria-controls="resizeCollapse">
-                                Resize Video
-                            </button>
-                        </h5>
-                    </div>
+            </div>
+            <!-- Video Options -->
+            <div class="card">
+                <div class="card-header" id="resizeHeading">
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#resizeCollapse" aria-controls="resizeCollapse">
+                        Video Settings
+                    </button>
+                </div>
 
-                    <div id="resizeCollapse" class="collapse" aria-labelledby="resizeHeading" data-parent="#ffmpegAccordion">
-                        <div class="card-body">
+                <div id="resizeCollapse" class="collapse" aria-labelledby="resizeHeading" data-parent="#ffmpegAccordion">
+                    <div class="card-body">
+                        <div id="resolution">
+                            <p>Resolution:</p>
                             <div>
-                                <SettingString ParameterName="Video Width"
-                                           OutputValueChanged="@HandleVideoWidthChange"
-                                           AllowAlpha="false"
-                                           AllowNumeric="true"
-                                           AllowSymbols="false"
-                                           InputValue="@ImageWidth.ToString()" />
-
+                                <SettingInput ParameterId="video-width"
+                                          Unit="px"
+                                          MinValue="0"
+                                          MaxValue="4096"
+                                          AllowAlpha="false"
+                                          AllowNumeric="true"
+                                          AllowSymbols="false"
+                                          InputValue="@ImageWidth.ToString()"
+                                          OutputValueChanged="@HandleVideoWidthChange" />
                             </div>
                             <div>
-                                <SettingString ParameterName="Video Height"
-                                           OutputValueChanged="@HandleVideoHeightChange"
-                                           AllowAlpha="false"
-                                           AllowNumeric="true"
-                                           AllowSymbols="false"
-                                           InputValue="@ImageHeight.ToString()" />
+                                <SettingInput ParameterId="video-height"
+                                          Unit="px"
+                                          MinValue="0"
+                                          MaxValue="4096"
+                                          AllowAlpha="false"
+                                          AllowNumeric="true"
+                                          AllowSymbols="false"
+                                          InputValue="@ImageHeight.ToString()"
+                                          OutputValueChanged="@HandleVideoHeightChange" />
                             </div>
                             <div class="d-flex flex-wrap">
                                 <button class="btn btn-outline-primary me-3 mb-3" @onclick="() => SetImageResolution(1280, 720)">HD 720p</button>
                                 <button class="btn btn-outline-primary me-3 mb-3" @onclick="() => SetImageResolution(1920, 1080)">FHD 1080p</button>
                                 <button class="btn btn-outline-primary me-3 mb-3" @onclick="() => SetImageResolution(3840, 2160)">4K 2160p</button>
+                            </div>
+                        </div>
+                        <div>
+                            <p>Video Bitrate:</p>
+                            <div>
+                                <SettingInput ParameterId="video-bitrate"
+                                          Unit="kbps"
+                                          MinValue="0"
+                                          OutputValueChanged="@HandleVideoBitrateChange"
+                                          AllowAlpha="false"
+                                          AllowNumeric="true"
+                                          AllowSymbols="false"
+                                          InputValue="@ImageWidth.ToString()" />
+
+                            </div>
+                        </div>
+                        <div>
+                            <p>Video Framerate:</p>
+                            <div>
+                                <SettingInput ParameterId="video-framerate"
+                                          Unit="FPS"
+                                          MinValue="1"
+                                          MaxValue="60"
+                                          OutputValueChanged="@HandleVideoBitrateChange"
+                                          AllowAlpha="false"
+                                          AllowNumeric="true"
+                                          AllowSymbols="false"
+                                          InputValue="@ImageWidth.ToString()" />
+
+                            </div>
+                        </div>
+                        <div>
+                            <p>Video Rotation:</p>
+                            <div>
+                                <SettingInput ParameterId="video-rotation"
+                                          Unit="degrees"
+                                          MaxValue="360"
+                                          MinValue="-360"
+                                          OutputValueChanged="@HandleRotationChange"
+                                          AllowAlpha="false"
+                                          AllowNumeric="true"
+                                          AllowSymbols="false"
+                                          InputValue="@Rotation.ToString()" />
+
                             </div>
                         </div>
                     </div>
@@ -97,11 +145,9 @@ else
 
             <div class="card">
                 <div class="card-header" id="audioHeading">
-                    <h5 class="mb-0">
-                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#audioCollapse" aria-expanded="true" aria-controls="audioCollapse">
-                            Extract Audio
-                        </button>
-                    </h5>
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#audioCollapse" aria-expanded="true" aria-controls="audioCollapse">
+                        Audio Settings
+                    </button>
                 </div>
 
                 <div id="audioCollapse" class="collapse" aria-labelledby="audioHeading" data-parent="#ffmpegAccordion">
@@ -114,11 +160,9 @@ else
 
             <div class="card">
                 <div class="card-header" id="watermarkHeading">
-                    <h5 class="mb-0">
-                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#watermarkCollapse" aria-expanded="true" aria-controls="watermarkCollapse">
-                            Add Watermark
-                        </button>
-                    </h5>
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#watermarkCollapse" aria-expanded="true" aria-controls="watermarkCollapse">
+                        Add Watermark
+                    </button>
                 </div>
 
                 <div id="watermarkCollapse" class="collapse" aria-labelledby="watermarkHeading" data-parent="#ffmpegAccordion">

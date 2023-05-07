@@ -1,0 +1,132 @@
+﻿<div>
+    <div class="form-group row">
+        <label for="@ParameterNameToLabelFor(ParameterId)"></label>
+        <div class="col-sm-9">
+            <div class="input-group">
+                <input id="@ParameterId"
+                       type="text"
+                       @bind="InputValue"
+                       @bind:event="oninput"
+                       max="@MaxValue"
+                       min="@MinValue" />
+                @if (!string.IsNullOrEmpty(Unit))
+                {
+                    <div class="input-group-append">
+                        <span class="input-group-text">@Unit</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string ParameterId { get; set; }
+
+    [Parameter]
+    public bool AllowAlpha { get; set; } = false;
+
+    [Parameter]
+    public bool AllowNumeric { get; set; } = false;
+
+    [Parameter]
+    public bool AllowSymbols { get; set; } = false;
+
+    private string inputValue;
+
+    [Parameter]
+    public string InputValue
+    {
+        get => inputValue;
+        set
+        {
+            if (IsValidInput(value))
+            {
+                var val = value;
+                if (MaxValue.HasValue)
+                {
+                    if (int.TryParse(val, out int x))
+                    {
+                        if (x > MaxValue) val = MaxValue.Value.ToString();
+                    }
+                }
+                if (MinValue.HasValue)
+                {
+                    if (int.TryParse(val, out int x))
+                    {
+                        if (x < MinValue) val = MinValue.Value.ToString();
+                    }
+                }
+
+                OutputValue = val;
+                inputValue = val;
+            }
+        }
+    }
+
+    private string outputValue;
+    [Parameter]
+    public string OutputValue
+    {
+        get => outputValue;
+        set
+        {
+            if (outputValue != value)
+            {
+                outputValue = value;
+                OutputValueChanged.InvokeAsync(outputValue);
+            }
+        }
+    }
+
+    [Parameter]
+    public string? Unit { get; set; }
+
+    [Parameter]
+    public int? MaxValue { get; set; }
+
+    [Parameter]
+    public int? MinValue { get; set; }
+
+    private string ParameterNameToLabelFor(string parameterName) =>
+        parameterName.Replace(" ", "-").ToLowerInvariant();
+
+    [Parameter]
+    public EventCallback<string> OutputValueChanged { get; set; }
+
+    private bool IsValidInput(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return true;
+        }
+
+        bool isAlpha, isNumeric, isSymbol, isPunctuation;
+        foreach (char c in value)
+        {
+            isAlpha = char.IsLetter(c);
+            isNumeric = char.IsDigit(c);
+            isSymbol = char.IsSymbol(c);
+            isPunctuation = char.IsPunctuation(c);
+
+            if (isAlpha && !AllowAlpha)
+            {
+                return false;
+            }
+
+            if (isNumeric && !AllowNumeric)
+            {
+                return false;
+            }
+
+            if ((isSymbol || isPunctuation) && !AllowSymbols)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+}

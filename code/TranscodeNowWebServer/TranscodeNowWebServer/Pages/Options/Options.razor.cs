@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text;
 using TranscodeNowWebServer.Data;
+using Microsoft.JSInterop;
 
 namespace TranscodeNowWebServer.Pages.Options;
 
@@ -45,14 +46,14 @@ public partial class Options
             var vsFields = typeof(VideoStream).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             foreach (FieldInfo field in vsFields)
             {
-                object value = field.GetValue(InitialVideoStream);
+                object? value = field.GetValue(InitialVideoStream);
                 field.SetValue(AlteredVideoStream, value);
             }
 
             var msFields = typeof(MediaStream).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             foreach (FieldInfo field in msFields)
             {
-                object value = field.GetValue(InitialVideoStream);
+                object? value = field.GetValue(InitialVideoStream);
                 field.SetValue(AlteredVideoStream, value);
             }
 
@@ -68,7 +69,7 @@ public partial class Options
             var asFields = typeof(AudioStream).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             foreach (FieldInfo field in asFields)
             {
-                object value = field.GetValue(InitialAudioStream);
+                object? value = field.GetValue(InitialAudioStream);
                 field.SetValue(AlteredAudioStream, value);
             }
 
@@ -77,36 +78,16 @@ public partial class Options
                 var msFields = typeof(MediaStream).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                 foreach (FieldInfo field in msFields)
                 {
-                    object value = field.GetValue(InitialAudioStream);
+                    object? value = field.GetValue(InitialAudioStream);
                     field.SetValue(AlteredAudioStream, value);
                 }
             }
-
-            ImageHeight = InitialVideoStream.Height;
-            ImageWidth = InitialVideoStream.Width;
         }
 
         if (InitialVideoStream is null && InitialAudioStream is null)
         {
             // no valid streams
-            return;
-        }
-    }
-
-    private void HandleVideoWidthChange(string width)
-    {
-        if (int.TryParse(width, out int value))
-        {
-            ImageWidth = value;
-            return;
-        }
-    }
-
-    private void HandleVideoHeightChange(string height)
-    {
-        if (int.TryParse(height, out int value))
-        {
-            ImageHeight = value;
+            Console.WriteLine("No valid streams");
             return;
         }
     }
