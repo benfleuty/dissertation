@@ -23,11 +23,11 @@ else
         <div class="accordion w-100" id="ffmpegAccordion">
             <!-- Video Options -->
             <div class="card">
-                <div class="card-header" id="resizeHeading">
-                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#resizeCollapse" aria-controls="resizeCollapse">
+                <div class="card-header" id="videoHeading">
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#videoCollapse" aria-controls="resizeCollapse">
                         Video Settings
                     </button>
-                    <div id="resizeCollapse" class="collapse" aria-labelledby="resizeHeading" data-parent="#ffmpegAccordion">
+                    <div id="videoCollapse" class="collapse" aria-labelledby="videoCollapse" data-parent="#ffmpegAccordion">
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="width">Width</label>
@@ -46,7 +46,7 @@ else
                                         <span class="input-group-text">px</span>
                                     </div>
                                 </div>
-                            </div>  
+                            </div>
                             <div class="form-group">
                                 <label for="bitrate">Video Bitrate</label>
                                 <div class="input-group">
@@ -164,6 +164,23 @@ else
                             </div>
                         </div>
 
+                    </div>
+                </div>
+            </div>
+            <!-- Audio Options -->
+            <div class="card">
+                <div class="card-header" id="audioHeading">
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#audioCollapse" aria-controls="resizeCollapse">
+                        Audio Settings
+                    </button>
+                    <div id="audioCollapse" class="collapse" aria-labelledby="audioCollapse" data-parent="#ffmpegAccordion">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="audioChannels">Audio Channels</label>
+                                <div class="input-group">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
