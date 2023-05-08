@@ -29,139 +29,141 @@ else
                     </button>
                     <div id="videoCollapse" class="collapse" aria-labelledby="videoCollapse" data-parent="#ffmpegAccordion">
                         <div class="card-body">
-                            <div class="form-group">
-                                <label for="width">Width</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" id="width" min="1" max="4096" placeholder="Enter width" @bind-value="ImageWidth">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">px</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="height">Height</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" id="height" min="1" max="4096" placeholder="Enter height" @bind-value="ImageHeight">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">px</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="bitrate">Video Bitrate</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" id="bitrate" min="1" max="50000" placeholder="Enter bitrate" @bind-value="VideoBitrate">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">kbps</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="framerate">Framerate</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" id="framerate" min="1" max="120" placeholder="Enter framerate" @bind-value="FrameRate">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">fps</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="rotation">Rotation</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" id="rotation" min="0" max="359" placeholder="Enter rotation" @bind-value="Rotation">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">degrees</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="flip-horizontal" @bind-value="HFlip">
-                                <label class="form-check-label" for="flip-horizontal">Flip Horizontally</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="flip-vertical" @bind-value="VFlip">
-                                <label class="form-check-label" for="flip-vertical">Flip Vertically</label>
-                            </div>
-                            <div class="form-group">
-                                <label for="start-time">Start Time</label>
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <div class="input-group">
-                                            <input type="number" class="form-control" id="start-time-hours" min="0" max="23" placeholder="HH" @bind-value="StartTimeHours">
-                                            <div class="input-group-append"><span class="input-group-text">h</span></div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="input-group">
-                                            <input type="number" class="form-control" id="start-time-minutes" min="0" max="59" placeholder="MM" @bind-value="StartTimeMinutes">
-                                            <div class="input-group-append"><span class="input-group-text">m</span></div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="input-group">
-                                            <input type="number" class="form-control" id="start-time-seconds" min="0" max="59" placeholder="SS" @bind-value="StartTimeSeconds">
-                                            <div class="input-group-append"><span class="input-group-text">s</span></div>
+                            <EditForm Model="@_videoOptions">
+                                <div class="form-group">
+                                    <label for="width">Width</label>
+                                    <div class="input-group">
+                                        <InputNumber @bind-Value="_videoOptions.Width" class="form-control" id="width" min="1" max="4096" placeholder="Enter width" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">px</span>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="end-time">End Time</label>
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <div class="input-group">
-                                            <input type="number" class="form-control" id="end-time-hours" min="0" max="23" placeholder="HH" @bind-value="EndTimeHours">
-                                            <div class="input-group-append"><span class="input-group-text">h</span></div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="input-group">
-                                            <input type="number" class="form-control" id="end-time-minutes" min="0" max="59" placeholder="MM" @bind-value="EndTimeMinutes">
-                                            <div class="input-group-append"><span class="input-group-text">m</span></div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="input-group">
-                                            <input type="number" class="form-control" id="end-time-seconds" min="0" max="59" placeholder="SS" @bind-value="EndTimeSeconds">
-                                            <div class="input-group-append"><span class="input-group-text">s</span></div>
+                                <div class="form-group">
+                                    <label for="height">Height</label>
+                                    <div class="input-group">
+                                        <InputNumber @bind-Value="_videoOptions.Height" class="form-control" id="height" min="1" max="4096" placeholder="Enter height" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">px</span>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="end-time">Crop Top/Bottom</label>
-                                <div class="row">
-                                    <div class="col-sm-6">
-                                        <div class="input-group">
-                                            <input type="number" class="form-control" id="crop-top" min="0" max="@InitialVideoStream.Height" @bind-value="CropTop">
-                                            <div class="input-group-append"><span class="input-group-text">px</span></div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="input-group">
-                                            <input type="number" class="form-control" id="crop-bottom" min="0" max="@InitialVideoStream.Height" @bind-value="CropBottom">
-                                            <div class="input-group-append"><span class="input-group-text">px</span></div>
+                                <div class="form-group">
+                                    <label for="bitrate">Video Bitrate</label>
+                                    <div class="input-group">
+                                        <InputNumber @bind-Value="_videoOptions.VideoBitrate" class="form-control" id="bitrate" min="1" max="50000" placeholder="Enter bitrate" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">kbps</span>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="end-time">Crop Left/Right</label>
-                                <div class="row">
-                                    <div class="col-sm-6">
-                                        <div class="input-group">
-                                            <input type="number" class="form-control" id="crop-left" min="0" max="@InitialVideoStream.Width" @bind-value="CropLeft">
-                                            <div class="input-group-append"><span class="input-group-text">px</span></div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="input-group">
-                                            <input type="number" class="form-control" id="crop-right" min="0" max="@InitialVideoStream.Width" @bind-value="CropRight">
-                                            <div class="input-group-append"><span class="input-group-text">px</span></div>
+                                <div class="form-group">
+                                    <label for="framerate">Framerate</label>
+                                    <div class="input-group">
+                                        <InputNumber @bind-Value="_videoOptions.FrameRate" class="form-control" id="framerate" min="1" max="120" placeholder="Enter framerate" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">fps</span>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                                <div class="form-group">
+                                    <label for="rotation">Rotation</label>
+                                    <div class="input-group">
+                                        <InputNumber @bind-Value="_videoOptions.Rotation" class="form-control" id="rotation" min="0" max="359" placeholder="Enter rotation" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">degrees</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-check">
+                                    <InputCheckbox @bind-Value="_videoOptions.HFlip" class="form-check-input" id="flip-horizontal" />
+                                    <label class="form-check-label" for="flip-horizontal">Flip Horizontally</label>
+                                </div>
+                                <div class="form-check">
+                                    <InputCheckbox @bind-Value="_videoOptions.VFlip" class="form-check-input" id="flip-vertical" />
+                                    <label class="form-check-label" for="flip-vertical">Flip Vertically</label>
+                                </div>
+                                <div class="form-group">
+                                    <label for="start-time">Start Time</label>
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <div class="input-group">
+                                                <InputNumber @bind-Value="_videoOptions.StartTimeHours" class="form-control" id="start-time-hours" min="0" max="23" placeholder="HH" />
+                                                <div class="input-group-append"><span class="input-group-text">h</span></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="input-group">
+                                                <InputNumber @bind-Value="_videoOptions.StartTimeMinutes" class="form-control" id="start-time-minutes" min="0" max="59" placeholder="MM" />
+                                                <div class="input-group-append"><span class="input-group-text">m</span></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="input-group">
+                                                <InputNumber @bind-Value="_videoOptions.StartTimeSeconds" class="form-control" id="start-time-seconds" min="0" max="59" placeholder="SS" />
+                                                <div class="input-group-append"><span class="input-group-text">s</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="end-time">End Time</label>
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <div class="input-group">
+                                                <InputNumber @bind-Value="_videoOptions.EndTimeHours" class="form-control" id="end-time-hours" min="0" max="23" placeholder="HH" />
+                                                <div class="input-group-append"><span class="input-group-text">h</span></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="input-group">
+                                                <InputNumber @bind-Value="_videoOptions.EndTimeMinutes" class="form-control" id="end-time-minutes" min="0" max="59" placeholder="MM" />
+                                                <div class="input-group-append"><span class="input-group-text">m</span></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="input-group">
+                                                <InputNumber @bind-Value="_videoOptions.EndTimeSeconds" class="form-control" id="end-time-seconds" min="0" max="59" placeholder="SS" />
+                                                <div class="input-group-append"><span class="input-group-text">s</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="end-time">Crop Top/Bottom</label>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="input-group">
+                                                <InputNumber @bind-Value="_videoOptions.CropTop" class="form-control" id="crop-top" min="0" max="@InitialVideoStream!.Height"/>
+                                                <div class="input-group-append"><span class="input-group-text">px</span></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="input-group">
+                                                <InputNumber @bind-Value="_videoOptions.CropBottom" class="form-control" id="crop-bottom" min="0" max="@InitialVideoStream.Height"/>
+                                                <div class="input-group-append"><span class="input-group-text">px</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="end-time">Crop Left/Right</label>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="input-group">
+                                                <InputNumber @bind-Value="_videoOptions.CropLeft" class="form-control" id="crop-left" min="0" max="@InitialVideoStream.Width"/>
+                                                <div class="input-group-append"><span class="input-group-text">px</span></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="input-group">
+                                                <InputNumber @bind-Value="_videoOptions.CropRight" class="form-control" id="crop-right" min="0" max="@InitialVideoStream.Width"/>
+                                                <div class="input-group-append"><span class="input-group-text">px</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </EditForm>
                         </div>
 
                     </div>

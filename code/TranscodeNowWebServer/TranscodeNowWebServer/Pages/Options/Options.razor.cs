@@ -18,7 +18,8 @@ public partial class Options
     private VideoStream? AlteredVideoStream;
     private AudioStream? AlteredAudioStream;
 
-    private AudioOptions _audioOptions = new();
+    private AudioOptions? _audioOptions;
+    private VideoOptions? _videoOptions;
 
     protected override async Task OnInitializedAsync()
     {
@@ -32,8 +33,8 @@ public partial class Options
 
     private void SetImageResolution(int width, int height)
     {
-        ImageWidth = width;
-        ImageHeight = height;
+        _videoOptions!.Width = width;
+        _videoOptions!.Height = height;
     }
 
     private void SetInitialValues()
@@ -61,8 +62,7 @@ public partial class Options
                 field.SetValue(AlteredVideoStream, value);
             }
 
-            ImageHeight = InitialVideoStream.Height;
-            ImageWidth = InitialVideoStream.Width;
+            _videoOptions = new (InitialVideoStream);
         }
 
         if (hasAudio)
@@ -86,6 +86,9 @@ public partial class Options
                     field.SetValue(AlteredAudioStream, value);
                 }
             }
+
+
+            _audioOptions = new(InitialAudioStream);
         }
 
         if (InitialVideoStream is null && InitialAudioStream is null)

@@ -1,8 +1,15 @@
 ﻿
+using FFMpegCore;
 using Microsoft.AspNetCore.Components;
 namespace TranscodeNowWebServer.Pages.Options;
 public class AudioOptions
 {
+    public AudioOptions(AudioStream audioStream)
+    {
+        _audioStream = audioStream;
+    }
+
+    private readonly AudioStream _audioStream;
     private int? _audioBitrate;
     private string? _audioCodec;
 
