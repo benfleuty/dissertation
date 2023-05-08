@@ -15,8 +15,8 @@ public partial class Options
     private VideoStream? InitialVideoStream;
     private AudioStream? InitialAudioStream;
 
-    private VideoStream? AlteredVideoStream;
-    private AudioStream? AlteredAudioStream;
+    //private VideoStream? AlteredVideoStream;
+    //private AudioStream? AlteredAudioStream;
 
     private GeneralOptions? _generalOptions;
     private AudioOptions? _audioOptions;
@@ -49,49 +49,56 @@ public partial class Options
         if (hasVideo)
         {
             InitialVideoStream = file.VideoStreams.First();
-            AlteredVideoStream = new VideoStream();
-
-            var vsFields = typeof(VideoStream).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            foreach (FieldInfo field in vsFields)
-            {
-                object? value = field.GetValue(InitialVideoStream);
-                field.SetValue(AlteredVideoStream, value);
-            }
-
-            var msFields = typeof(MediaStream).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            foreach (FieldInfo field in msFields)
-            {
-                object? value = field.GetValue(InitialVideoStream);
-                field.SetValue(AlteredVideoStream, value);
-            }
-
             _videoOptions = new(InitialVideoStream);
+
+            //AlteredVideoStream = new VideoStream();
+
+            //var vsFields = typeof(VideoStream).GetFields(BindingFlags.Instance |
+            //    BindingFlags.Public |
+            //    BindingFlags.NonPublic);
+
+            //foreach (FieldInfo field in vsFields)
+            //{
+            //    object? value = field.GetValue(InitialVideoStream);
+            //    field.SetValue(AlteredVideoStream, value);
+            //}
+
+            //var msFields = typeof(MediaStream).GetFields(BindingFlags.Instance |
+            //    BindingFlags.Public |
+            //    BindingFlags.NonPublic);
+
+            //foreach (FieldInfo field in msFields)
+            //{
+            //    object? value = field.GetValue(InitialVideoStream);
+            //    field.SetValue(AlteredVideoStream, value);
+            //}
+
         }
 
         if (hasAudio)
         {
             InitialAudioStream = file.AudioStreams.First();
-            AlteredAudioStream = new AudioStream();
-
-            var asFields = typeof(AudioStream).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            foreach (FieldInfo field in asFields)
-            {
-                object? value = field.GetValue(InitialAudioStream);
-                field.SetValue(AlteredAudioStream, value);
-            }
-
-            if (!hasVideo)
-            {
-                var msFields = typeof(MediaStream).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-                foreach (FieldInfo field in msFields)
-                {
-                    object? value = field.GetValue(InitialAudioStream);
-                    field.SetValue(AlteredAudioStream, value);
-                }
-            }
-
-
             _audioOptions = new(InitialAudioStream);
+            //AlteredAudioStream = new AudioStream();
+
+            //var asFields = typeof(AudioStream).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            //foreach (FieldInfo field in asFields)
+            //{
+            //    object? value = field.GetValue(InitialAudioStream);
+            //    field.SetValue(AlteredAudioStream, value);
+            //}
+
+            //if (!hasVideo)
+            //{
+            //    var msFields = typeof(MediaStream).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            //    foreach (FieldInfo field in msFields)
+            //    {
+            //        object? value = field.GetValue(InitialAudioStream);
+            //        field.SetValue(AlteredAudioStream, value);
+            //    }
+            //}
+
+
         }
 
         if (InitialVideoStream is null && InitialAudioStream is null)
@@ -104,12 +111,16 @@ public partial class Options
 
     private void OnButtonClick()
     {
-        if (InitialVideoStream is null && InitialAudioStream is null) return;
+        if (InitialVideoStream is null && InitialAudioStream is null)
+        {
+            Console.WriteLine("Cannot send transcode message: No streams available");
+            return;
+        }
 
-        if (!IsChangesMade()) return;
+        //if (!IsChangesMade()) return;
 
         userOptionsService.UserOptions =
-            GetSelectedOptions(InitialVideoStream is not null, InitialAudioStream is not null);
+            GetSelectedOptions(/*InitialVideoStream is not null, InitialAudioStream is not null*/);
 
         var msg = new MqqtTranscodeMessage(
             fileService.UploadedFileModel,
@@ -128,48 +139,56 @@ public partial class Options
         string queueName = "transcode-in";
         string message = JsonSerializer.Serialize(msg);
         var body = Encoding.UTF8.GetBytes(message);
+        Console.WriteLine(message);
+        return;
         channel.BasicPublish(exchange: "", routingKey: queueName, basicProperties: null, body: body);
     }
 
-    private UserOptions GetSelectedOptions(bool hasVideo, bool hasAudio)
+    private UserOptions GetSelectedOptions(/*bool hasVideo, bool hasAudio*/)
     {
-        var message = new UserOptions();
-        if (hasVideo) GetVideoOptions(ref message);
-        if (hasAudio) GetAudioOptions(ref message);
+        var message = new UserOptions()
+        {
+            GeneralOptions = _generalOptions,
+            VideoOptions = _videoOptions,
+            AudioOptions = _audioOptions
+        };
+
+        //if (hasVideo) GetVideoOptions(ref message);
+        //if (hasAudio) GetAudioOptions(ref message);
         return message;
     }
 
-    private void GetAudioOptions(ref UserOptions message)
-    {
-        return;
-    }
+    //private void GetAudioOptions(ref UserOptions message)
+    //{
+    //    return;
+    //}
 
-    private void GetVideoOptions(ref UserOptions message)
-    {
-        message.Height = AlteredVideoStream.Height;
-        message.Width = AlteredVideoStream.Width;
-    }
+    //private void GetVideoOptions(ref UserOptions message)
+    //{
+    //    message.Height = AlteredVideoStream.Height;
+    //    message.Width = AlteredVideoStream.Width;
+    //}
 
-    private bool IsChangesMade()
-    {
-        var fields = typeof(VideoStream)
-           .GetFields(
-           BindingFlags.Instance |
-           BindingFlags.Public |
-           BindingFlags.NonPublic
-       );
+    //private bool IsChangesMade()
+    //{
+    //    var fields = typeof(VideoStream)
+    //       .GetFields(
+    //       BindingFlags.Instance |
+    //       BindingFlags.Public |
+    //       BindingFlags.NonPublic
+    //   );
 
-        bool changesMade = false;
+    //    bool changesMade = false;
 
-        foreach (FieldInfo field in fields)
-        {
-            object initialValue = field.GetValue(InitialVideoStream);
-            object alteredValue = field.GetValue(AlteredVideoStream);
+    //    foreach (FieldInfo field in fields)
+    //    {
+    //        object initialValue = field.GetValue(InitialVideoStream);
+    //        object alteredValue = field.GetValue(AlteredVideoStream);
 
-            changesMade |= !Equals(initialValue, alteredValue);
-        }
-        return changesMade;
-    }
+    //        changesMade |= !Equals(initialValue, alteredValue);
+    //    }
+    //    return changesMade;
+    //}
 
     private Dictionary<string, (string, MarkupString)> _helpMessages = new()
     {
