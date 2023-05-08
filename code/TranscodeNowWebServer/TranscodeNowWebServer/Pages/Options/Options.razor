@@ -3,7 +3,6 @@
 @inject NavigationManager navManager
 @inject Interfaces.IUploadedFileService fileService
 @inject Interfaces.IUserOptions userOptionsService
-
 <PageTitle>Options</PageTitle>
 
 @if (fileService.UploadedFileModel is null)
@@ -16,159 +15,155 @@ else
     <h1 class="text-center">Enter your settings</h1>
     <p class="text-center mx-2">Now we need to know what you want to do to your file:</p>
 
-    <p>File Name: @fileService.UploadedFileModel.OriginalFileName / @fileService.UploadedFileModel.RandomFileName </p>
+    <p>File Name: @fileService.UploadedFileModel.OriginalFileName / @fileService.UploadedFileModel.RandomFileName</p>
     <div>
         <button @onclick="OnButtonClick">Click Me</button>
     </div>
     <div class="d-flex align-items-center justify-content-center">
         <div class="accordion w-100" id="ffmpegAccordion">
-            <!-- Selected Options -->
-            <div class="card">
-                <div class="card-header" id="userOptions">
-                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#userOptionsCollapse" aria-controls="resizeCollapse">
-                        Your Selected Settings
-                    </button>
-                </div>
-                <div id="userOptionsCollapse" class="collapse" aria-labelledby="resizeHeading" data-parent="#ffmpegAccordion">
-                    <div class="card-body">
-                        <div>
-                            <p>
-                                This section contains all the settings that you have selected.
-                            </p>
-                        </div>
-                        <div>
-                            <SettingInput ParameterId="video-width"
-                                      Unit="px"
-                                      AllowAlpha="false"
-                                      AllowNumeric="true"
-                                      AllowSymbols="false"
-                                      OutputValueChanged="@HandleVideoWidthChange" />
-                        </div>
-                        <div>
-                            <SettingInput ParameterId="video-height"
-                                      Unit="px"
-                                      AllowAlpha="false"
-                                      AllowNumeric="true"
-                                      AllowSymbols="false"
-                                      OutputValueChanged="@HandleVideoHeightChange" />
-                        </div>
-                    </div>
-                </div>
-            </div>
             <!-- Video Options -->
             <div class="card">
                 <div class="card-header" id="resizeHeading">
                     <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#resizeCollapse" aria-controls="resizeCollapse">
                         Video Settings
                     </button>
-                </div>
-
-                <div id="resizeCollapse" class="collapse" aria-labelledby="resizeHeading" data-parent="#ffmpegAccordion">
-                    <div class="card-body">
-                        <div id="resolution">
-                            <p>Resolution:</p>
-                            <div>
-                                <SettingInput ParameterId="video-width"
-                                          Unit="px"
-                                          MinValue="0"
-                                          MaxValue="4096"
-                                          AllowAlpha="false"
-                                          AllowNumeric="true"
-                                          AllowSymbols="false"
-                                          InputValue="@ImageWidth.ToString()"
-                                          OutputValueChanged="@HandleVideoWidthChange" />
+                    <div id="resizeCollapse" class="collapse" aria-labelledby="resizeHeading" data-parent="#ffmpegAccordion">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="width">Width</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="width" min="1" max="4096" placeholder="Enter width" @bind-value="ImageWidth">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">px</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <SettingInput ParameterId="video-height"
-                                          Unit="px"
-                                          MinValue="0"
-                                          MaxValue="4096"
-                                          AllowAlpha="false"
-                                          AllowNumeric="true"
-                                          AllowSymbols="false"
-                                          InputValue="@ImageHeight.ToString()"
-                                          OutputValueChanged="@HandleVideoHeightChange" />
+                            <div class="form-group">
+                                <label for="height">Height</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="height" min="1" max="4096" placeholder="Enter height" @bind-value="ImageHeight">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">px</span>
+                                    </div>
+                                </div>
+                            </div>  
+                            <div class="form-group">
+                                <label for="bitrate">Video Bitrate</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="bitrate" min="1" max="50000" placeholder="Enter bitrate" @bind-value="VideoBitrate">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">kbps</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="d-flex flex-wrap">
-                                <button class="btn btn-outline-primary me-3 mb-3" @onclick="() => SetImageResolution(1280, 720)">HD 720p</button>
-                                <button class="btn btn-outline-primary me-3 mb-3" @onclick="() => SetImageResolution(1920, 1080)">FHD 1080p</button>
-                                <button class="btn btn-outline-primary me-3 mb-3" @onclick="() => SetImageResolution(3840, 2160)">4K 2160p</button>
+                            <div class="form-group">
+                                <label for="framerate">Framerate</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="framerate" min="1" max="120" placeholder="Enter framerate" @bind-value="FrameRate">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">fps</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="rotation">Rotation</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="rotation" min="0" max="359" placeholder="Enter rotation" @bind-value="Rotation">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">degrees</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="flip-horizontal" @bind-value="HFlip">
+                                <label class="form-check-label" for="flip-horizontal">Flip Horizontally</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="flip-vertical" @bind-value="VFlip">
+                                <label class="form-check-label" for="flip-vertical">Flip Vertically</label>
+                            </div>
+                            <div class="form-group">
+                                <label for="start-time">Start Time</label>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="start-time-hours" min="0" max="23" placeholder="HH" @bind-value="StartTimeHours">
+                                            <div class="input-group-append"><span class="input-group-text">h</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="start-time-minutes" min="0" max="59" placeholder="MM" @bind-value="StartTimeMinutes">
+                                            <div class="input-group-append"><span class="input-group-text">m</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="start-time-seconds" min="0" max="59" placeholder="SS" @bind-value="StartTimeSeconds">
+                                            <div class="input-group-append"><span class="input-group-text">s</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="end-time">End Time</label>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="end-time-hours" min="0" max="23" placeholder="HH" @bind-value="EndTimeHours">
+                                            <div class="input-group-append"><span class="input-group-text">h</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="end-time-minutes" min="0" max="59" placeholder="MM" @bind-value="EndTimeMinutes">
+                                            <div class="input-group-append"><span class="input-group-text">m</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="end-time-seconds" min="0" max="59" placeholder="SS" @bind-value="EndTimeSeconds">
+                                            <div class="input-group-append"><span class="input-group-text">s</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="end-time">Crop Top/Bottom</label>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="crop-top" min="0" max="@InitialVideoStream.Height" @bind-value="CropTop">
+                                            <div class="input-group-append"><span class="input-group-text">px</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="crop-bottom" min="0" max="@InitialVideoStream.Height" @bind-value="CropBottom">
+                                            <div class="input-group-append"><span class="input-group-text">px</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="end-time">Crop Left/Right</label>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="crop-left" min="0" max="@InitialVideoStream.Width" @bind-value="CropLeft">
+                                            <div class="input-group-append"><span class="input-group-text">px</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="crop-right" min="0" max="@InitialVideoStream.Width" @bind-value="CropRight">
+                                            <div class="input-group-append"><span class="input-group-text">px</span></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div>
-                            <p>Video Bitrate:</p>
-                            <div>
-                                <SettingInput ParameterId="video-bitrate"
-                                          Unit="kbps"
-                                          MinValue="0"
-                                          OutputValueChanged="@HandleVideoBitrateChange"
-                                          AllowAlpha="false"
-                                          AllowNumeric="true"
-                                          AllowSymbols="false"
-                                          InputValue="@ImageWidth.ToString()" />
 
-                            </div>
-                        </div>
-                        <div>
-                            <p>Video Framerate:</p>
-                            <div>
-                                <SettingInput ParameterId="video-framerate"
-                                          Unit="FPS"
-                                          MinValue="1"
-                                          MaxValue="60"
-                                          OutputValueChanged="@HandleVideoBitrateChange"
-                                          AllowAlpha="false"
-                                          AllowNumeric="true"
-                                          AllowSymbols="false"
-                                          InputValue="@ImageWidth.ToString()" />
-
-                            </div>
-                        </div>
-                        <div>
-                            <p>Video Rotation:</p>
-                            <div>
-                                <SettingInput ParameterId="video-rotation"
-                                          Unit="degrees"
-                                          MaxValue="360"
-                                          MinValue="-360"
-                                          OutputValueChanged="@HandleRotationChange"
-                                          AllowAlpha="false"
-                                          AllowNumeric="true"
-                                          AllowSymbols="false"
-                                          InputValue="@Rotation.ToString()" />
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header" id="audioHeading">
-                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#audioCollapse" aria-expanded="true" aria-controls="audioCollapse">
-                        Audio Settings
-                    </button>
-                </div>
-
-                <div id="audioCollapse" class="collapse" aria-labelledby="audioHeading" data-parent="#ffmpegAccordion">
-                    <div class="card-body">
-                        <p>To extract audio from a video, use the following command:</p>
-                        <code>ffmpeg -i input.mp4 -vn -acodec copy output.aac</code>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header" id="watermarkHeading">
-                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#watermarkCollapse" aria-expanded="true" aria-controls="watermarkCollapse">
-                        Add Watermark
-                    </button>
-                </div>
-
-                <div id="watermarkCollapse" class="collapse" aria-labelledby="watermarkHeading" data-parent="#ffmpegAccordion">
-                    <div class="card-body">
-                        <p>To add a watermark to a video, use the following command:</p>
-                        <code>ffmpeg -i input.mp4 -i watermark.png -filter_complex "overlay=10:10" output.mp4</code>
                     </div>
                 </div>
             </div>

@@ -5,6 +5,8 @@ using System.Text.Json;
 using System.Text;
 using TranscodeNowWebServer.Data;
 using Microsoft.JSInterop;
+using TranscodeNowWebServer.Interfaces;
+using Microsoft.AspNetCore.Components;
 
 namespace TranscodeNowWebServer.Pages.Options;
 
@@ -159,5 +161,29 @@ public partial class Options
             changesMade |= !Equals(initialValue, alteredValue);
         }
         return changesMade;
+    }
+
+    private int? MaxStartTimeHours
+    {
+        get => fileService.UploadedFileModel.Data.Duration.Hours;
+    }
+
+
+    private int? MaxStartTimeMinutes
+    {
+        get
+        {
+            if (MaxStartTimeHours > 0) return 59;
+            return fileService.UploadedFileModel.Data.Duration.Minutes;
+        }
+    }
+
+    private int? MaxStartTimeSeconds
+    {
+        get
+        {
+            if (MaxStartTimeMinutes > 0) return 59;
+            return fileService.UploadedFileModel.Data.Duration.Seconds;
+        }
     }
 }
