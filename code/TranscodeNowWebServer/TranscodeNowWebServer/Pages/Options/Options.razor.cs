@@ -7,6 +7,7 @@ using TranscodeNowWebServer.Data;
 using Microsoft.JSInterop;
 using TranscodeNowWebServer.Interfaces;
 using Microsoft.AspNetCore.Components;
+using FFMpegCore.Enums;
 
 namespace TranscodeNowWebServer.Pages.Options;
 
@@ -49,8 +50,8 @@ public partial class Options
         if (hasVideo)
         {
             InitialVideoStream = file.VideoStreams.First();
-            _videoOptions = new(InitialVideoStream);
 
+            _videoOptions = new(InitialVideoStream);
             //AlteredVideoStream = new VideoStream();
 
             //var vsFields = typeof(VideoStream).GetFields(BindingFlags.Instance |

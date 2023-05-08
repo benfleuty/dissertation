@@ -1,4 +1,6 @@
 ﻿using FFMpegCore;
+using FFMpegCore.Enums;
+using UploadedFilesLibrary;
 
 namespace TranscodeNowWebServer.Pages.Options;
 
@@ -16,20 +18,29 @@ public class VideoOptions
     private int? _endTimeSeconds;
     private double? _frameRate;
     private int? _height;
-    private bool _hFlip;
-    private string? _outputFormat;
+    private bool _hFlip = false;
+    private string? _outputFormat;          // TODO: IMPLEMENT
     private int? _rotation;
-    private int? _startTimeHours;
-    private int? _startTimeMinutes;
-    private int? _startTimeSeconds;
-    private bool _vFlip;
-    private long? _videoBitrate;
-    private string? _videoCodec;
+    private int? _startTimeHours = 0;
+    private int? _startTimeMinutes = 0;
+    private int? _startTimeSeconds = 0;
+    private bool _vFlip = false;
+    private long? _bitrate;
+    private string? _codec;            // TODO: IMPLEMENT
     private int? _width;
 
     public VideoOptions(VideoStream videoStream)
     {
         _videoStream = videoStream;
+        EndTimeHours = videoStream.Duration.Hours;
+        EndTimeMinutes = videoStream.Duration.Minutes;
+        EndTimeSeconds = videoStream.Duration.Seconds;
+        FrameRate = videoStream.FrameRate;
+        Height = videoStream.Height;
+        Rotation = videoStream.Rotation;
+        Height = videoStream.Height;
+        Width = videoStream.Width;
+        BitRate = videoStream.BitRate;
     }
 
     public int? CropBottom
@@ -37,12 +48,9 @@ public class VideoOptions
         get { return _cropBottom; }
         set
         {
-            if (value is null)
-            {
-                _cropBottom = null;
-                return;
-            }
+            if (value is null) { _cropBottom = null; return; }
             int val = value.Value;
+            if (val == 0) { _cropBottom = null; return; }
             int top = CropTop ?? 0;
             int max = _videoStream.Height;
 
@@ -58,12 +66,9 @@ public class VideoOptions
         get { return _cropLeft; }
         set
         {
-            if (value is null)
-            {
-                _cropLeft = null;
-                return;
-            }
+            if (value is null) { _cropLeft = null; return; }
             int val = value.Value;
+            if (val == 0) { _cropLeft = null; return; }
             int right = CropRight ?? 0;
             int max = _videoStream.Width;
 
@@ -80,12 +85,9 @@ public class VideoOptions
         get { return _cropRight; }
         set
         {
-            if (value is null)
-            {
-                _cropRight = null;
-                return;
-            }
+            if (value is null) { _cropRight = null; return; }
             int val = value.Value;
+            if (val == 0) { _cropRight = null; return; }
             int left = CropLeft ?? 0;
             int max = _videoStream.Width;
 
@@ -102,12 +104,9 @@ public class VideoOptions
         get { return _cropTop; }
         set
         {
-            if (value is null)
-            {
-                _cropTop = null;
-                return;
-            }
+            if (value is null) { _cropTop = null; return; }
             int val = value.Value;
+            if (val == 0) { _cropTop = null; return; }
             int bottom = CropBottom ?? 0;
             int max = _videoStream.Height;
 
@@ -124,11 +123,7 @@ public class VideoOptions
         get => _endTimeHours;
         set
         {
-            if (value is null)
-            {
-                _endTimeHours = null;
-                return;
-            }
+            if (value is null) { _endTimeHours = null; return; }
             int result = value.Value;
             if (value < 0) result = 0;
             else if (value > 10) result = 10;
@@ -145,11 +140,7 @@ public class VideoOptions
         get => _endTimeMinutes;
         set
         {
-            if (value is null)
-            {
-                _endTimeMinutes = null;
-                return;
-            }
+            if (value is null) { _endTimeMinutes = null; return; }
             int result = value.Value;
             if (value < 0) result = 0;
             else if (value > 10) result = 10;
@@ -167,11 +158,7 @@ public class VideoOptions
         get => _endTimeSeconds;
         set
         {
-            if (value is null)
-            {
-                _endTimeSeconds = null;
-                return;
-            }
+            if (value is null) { _endTimeSeconds = null; return; }
             int result = value.Value;
             if (string.IsNullOrEmpty(result.ToString())) result = 0;
             else if (value < 0) result = 0;
@@ -243,11 +230,7 @@ public class VideoOptions
         get => _startTimeHours;
         set
         {
-            if (value is null)
-            {
-                _startTimeHours = null;
-                return;
-            }
+            if (value is null) { _startTimeHours = null; return; }
             int result = value.Value;
             if (value < 0) result = 0;
             else if (value > 10) result = 10;
@@ -261,11 +244,7 @@ public class VideoOptions
         get => _startTimeMinutes;
         set
         {
-            if (value is null)
-            {
-                _startTimeMinutes = null;
-                return;
-            }
+            if (value is null) { _startTimeMinutes = null; return; }
             int result = value.Value;
             TimeSpan fileTime = _videoStream.Duration;
             int hours = fileTime.Hours;
@@ -285,11 +264,7 @@ public class VideoOptions
         get => _startTimeSeconds;
         set
         {
-            if (value is null)
-            {
-                _startTimeSeconds = null;
-                return;
-            }
+            if (value is null) { _startTimeSeconds = null; return; }
             int result = value.Value;
             TimeSpan fileTime = _videoStream.Duration;
             int mins = fileTime.Minutes;
@@ -314,24 +289,24 @@ public class VideoOptions
         }
     }
 
-    public long? VideoBitrate
+    public long? BitRate
     {
-        get => _videoBitrate;
+        get => _bitrate;
         set
         {
-            long val = value ?? _videoBitrate ?? _videoStream.BitRate;
+            long val = value ?? _bitrate ?? _videoStream.BitRate;
 
             if (val > 50000) val = 50000;
             else if (val < 0) val = 0;
 
-            _videoBitrate = val;
+            _bitrate = val;
         }
     }
 
     public string? VideoCodec
     {
-        get => _videoCodec;
-        set { _videoCodec = value; }
+        get => _codec;
+        set { _codec = value; }
     }
 
     public int? Width
