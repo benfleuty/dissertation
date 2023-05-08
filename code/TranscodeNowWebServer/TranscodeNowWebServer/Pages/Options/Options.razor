@@ -19,7 +19,7 @@ else
     <div>
         <button @onclick="OnButtonClick">Click Me</button>
     </div>
-    <div class="d-flex align-items-center justify-content-center">
+    <div class="d-flex">
         <div class="accordion w-100" id="ffmpegAccordion">
             <!-- Video Options -->
             <div class="card">
@@ -130,34 +130,35 @@ else
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="end-time">Crop Top/Bottom</label>
+                                    <label for="end-time">Crop</label>
                                     <div class="row">
                                         <div class="col-sm-6">
+                                            <label for="crop-top" class="form-label">Top</label>
                                             <div class="input-group">
-                                                <InputNumber @bind-Value="_videoOptions.CropTop" class="form-control" id="crop-top" min="0" max="@InitialVideoStream!.Height"/>
+                                                <InputNumber @bind-Value="_videoOptions.CropTop" class="form-control" id="crop-top" min="0" max="@InitialVideoStream!.Height" />
                                                 <div class="input-group-append"><span class="input-group-text">px</span></div>
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
+                                            <label for="crop-top" class="form-label">Bottom</label>
                                             <div class="input-group">
-                                                <InputNumber @bind-Value="_videoOptions.CropBottom" class="form-control" id="crop-bottom" min="0" max="@InitialVideoStream.Height"/>
+                                                <InputNumber @bind-Value="_videoOptions.CropBottom" class="form-control" id="crop-bottom" min="0" max="@InitialVideoStream.Height" />
                                                 <div class="input-group-append"><span class="input-group-text">px</span></div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="end-time">Crop Left/Right</label>
                                     <div class="row">
                                         <div class="col-sm-6">
+                                            <label for="crop-top" class="form-label">Left</label>
                                             <div class="input-group">
-                                                <InputNumber @bind-Value="_videoOptions.CropLeft" class="form-control" id="crop-left" min="0" max="@InitialVideoStream.Width"/>
+                                                <InputNumber @bind-Value="_videoOptions.CropLeft" class="form-control" id="crop-left" min="0" max="@InitialVideoStream.Width" />
                                                 <div class="input-group-append"><span class="input-group-text">px</span></div>
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
+                                            <label for="crop-top" class="form-label">Right</label>
                                             <div class="input-group">
-                                                <InputNumber @bind-Value="_videoOptions.CropRight" class="form-control" id="crop-right" min="0" max="@InitialVideoStream.Width"/>
+                                                <InputNumber @bind-Value="_videoOptions.CropRight" class="form-control" id="crop-right" min="0" max="@InitialVideoStream.Width" />
                                                 <div class="input-group-append"><span class="input-group-text">px</span></div>
                                             </div>
                                         </div>
