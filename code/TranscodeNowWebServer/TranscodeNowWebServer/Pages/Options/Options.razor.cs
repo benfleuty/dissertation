@@ -18,6 +18,8 @@ public partial class Options
     private VideoStream? AlteredVideoStream;
     private AudioStream? AlteredAudioStream;
 
+    private AudioOptions _audioOptions = new();
+
     protected override async Task OnInitializedAsync()
     {
         if (fileService.UploadedFileModel is null || fileService.UploadedFileModel.File is null)
