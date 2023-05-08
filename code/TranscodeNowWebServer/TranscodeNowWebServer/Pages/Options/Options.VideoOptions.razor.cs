@@ -1,8 +1,12 @@
-﻿namespace TranscodeNowWebServer.Pages.Options;
+﻿using FFMpegCore;
+
+namespace TranscodeNowWebServer.Pages.Options;
 
 // Video
-public partial class Options
+public class VideoOptions
 {
+    private VideoStream _videoStream;
+
     private int? _cropBottom;
     private int? _cropLeft;
     private int? _cropRight;
@@ -11,22 +15,22 @@ public partial class Options
     private int? _endTimeMinutes;
     private int? _endTimeSeconds;
     private double? _frameRate;
-    private bool? _hFlip;
-    private int? _imageHeight;
-    private int? _imageWidth;
-
+    private int? _height;
+    private bool _hFlip;
     private string? _outputFormat;
-
     private int? _rotation;
-
     private int? _startTimeHours;
     private int? _startTimeMinutes;
     private int? _startTimeSeconds;
-
-    private bool? _vFlip;
+    private bool _vFlip;
     private long? _videoBitrate;
-
     private string? _videoCodec;
+    private int? _width;
+
+    public VideoOptions(VideoStream videoStream)
+    {
+        _videoStream = videoStream;
+    }
 
     public int? CropBottom
     {
@@ -40,13 +44,12 @@ public partial class Options
             }
             int val = value.Value;
             int top = CropTop ?? 0;
-            int max = InitialVideoStream.Height;
+            int max = _videoStream.Height;
 
-            if (val + top > max) val = (int)CropBottom;
+            if (val + top > max) val = CropBottom ?? 0;
             else if (val < 0) val = 0;
 
             _cropBottom = val;
-            StateHasChanged();
         }
     }
 
@@ -62,13 +65,13 @@ public partial class Options
             }
             int val = value.Value;
             int right = CropRight ?? 0;
-            int max = InitialVideoStream.Width;
+            int max = _videoStream.Width;
 
-            if (val + right > max) val = (int)CropLeft;
+            if (val + right > max) val = CropLeft ?? 0;
             else if (val < 0) val = 0;
 
             _cropLeft = val;
-            StateHasChanged();
+
         }
     }
 
@@ -84,13 +87,13 @@ public partial class Options
             }
             int val = value.Value;
             int left = CropLeft ?? 0;
-            int max = InitialVideoStream.Width;
+            int max = _videoStream.Width;
 
-            if (val + left > max) val = (int)CropRight;
+            if (val + left > max) val = CropRight ?? 0;
             else if (val < 0) val = 0;
 
             _cropRight = val;
-            StateHasChanged();
+
         }
     }
 
@@ -106,13 +109,13 @@ public partial class Options
             }
             int val = value.Value;
             int bottom = CropBottom ?? 0;
-            int max = InitialVideoStream.Height;
+            int max = _videoStream.Height;
 
-            if (val + bottom > max) val = (int)CropTop;
+            if (val + bottom > max) val = CropTop ?? 0;
             else if (val < 0) val = 0;
 
             _cropTop = val;
-            StateHasChanged();
+
         }
     }
 
@@ -153,7 +156,7 @@ public partial class Options
 
             if (result < StartTimeMinutes &&
                 EndTimeHours <= StartTimeHours)
-                result = StartTimeMinutes;
+                result = StartTimeMinutes.GetValueOrDefault(0);
 
             _endTimeMinutes = result;
         }
@@ -164,14 +167,19 @@ public partial class Options
         get => _endTimeSeconds;
         set
         {
-            int result = value;
+            if (value is null)
+            {
+                _endTimeSeconds = null;
+                return;
+            }
+            int result = value.Value;
             if (string.IsNullOrEmpty(result.ToString())) result = 0;
             else if (value < 0) result = 0;
             else if (value > 10) result = 10;
 
             if (result < StartTimeSeconds &&
                 (EndTimeHours <= StartTimeHours || EndTimeMinutes <= StartTimeMinutes))
-                result = StartTimeSeconds;
+                result = StartTimeSeconds.GetValueOrDefault(0);
 
             _endTimeSeconds = result;
         }
@@ -182,14 +190,27 @@ public partial class Options
         get => _frameRate;
         set
         {
-            double result = value ?? _frameRate ?? InitialVideoStream.FrameRate;
+            double result = value ?? _frameRate ?? _videoStream.FrameRate;
             if (result < 1) result = 1;
             else if (result > 120) result = 120;
             _frameRate = result;
         }
     }
 
-    public bool? HFlip
+    public int? Height
+    {
+        get => _height;
+        set
+        {
+            int val = value ?? _height ?? _videoStream.Height;
+            if (val > 4096) val = 4096;
+            if (val < 1) val = 1;
+
+            _height = val;
+        }
+    }
+
+    public bool HFlip
     {
         get => _hFlip;
         set
@@ -197,46 +218,18 @@ public partial class Options
             _hFlip = value;
         }
     }
-
-    public int? ImageHeight
-    {
-        get => _imageHeight;
-        set
-        {
-            int val = value ?? _imageHeight ?? InitialVideoStream.Height;
-            if (val > 4096) val = 4096;
-            if (val < 1) val = 1;
-
-            _imageHeight = val;
-            AlteredVideoStream!.Height = val;
-        }
-    }
-
-    public int? ImageWidth
-    {
-        get => _imageWidth;
-        set
-        {
-            int val = value ?? _imageWidth ?? InitialVideoStream.Width;
-
-            if (val > 4096) val = 4096;
-            if (val < 1) val = 1;
-
-            _imageWidth = val;
-            AlteredVideoStream!.Width = val;
-        }
-    }
     public string? OutputFormat
     {
         get => _outputFormat;
         set { _outputFormat = value; }
     }
+
     public int? Rotation
     {
         get => _rotation;
         set
         {
-            int val = value ?? _rotation ?? InitialVideoStream.Rotation;
+            int val = value ?? _rotation ?? _videoStream.Rotation;
 
             if (val < 0) val += 360;
             if (val > 359) val = 359;
@@ -262,6 +255,7 @@ public partial class Options
             _startTimeHours = result;
         }
     }
+
     public int? StartTimeMinutes
     {
         get => _startTimeMinutes;
@@ -273,7 +267,7 @@ public partial class Options
                 return;
             }
             int result = value.Value;
-            TimeSpan fileTime = InitialVideoStream.Duration;
+            TimeSpan fileTime = _videoStream.Duration;
             int hours = fileTime.Hours;
             if (value < 0) result = 0;
             else if (value > 59) result = 59;
@@ -285,6 +279,7 @@ public partial class Options
             _startTimeMinutes = result;
         }
     }
+
     public int? StartTimeSeconds
     {
         get => _startTimeSeconds;
@@ -296,7 +291,7 @@ public partial class Options
                 return;
             }
             int result = value.Value;
-            TimeSpan fileTime = InitialVideoStream.Duration;
+            TimeSpan fileTime = _videoStream.Duration;
             int mins = fileTime.Minutes;
             if (string.IsNullOrEmpty(result.ToString())) result = 0;
             else if (value < 0) result = 0;
@@ -309,7 +304,8 @@ public partial class Options
             _startTimeSeconds = result;
         }
     }
-    public bool? VFlip
+
+    public bool VFlip
     {
         get => _vFlip;
         set
@@ -323,7 +319,7 @@ public partial class Options
         get => _videoBitrate;
         set
         {
-            long val = value ?? _videoBitrate ?? InitialVideoStream.BitRate;
+            long val = value ?? _videoBitrate ?? _videoStream.BitRate;
 
             if (val > 50000) val = 50000;
             else if (val < 0) val = 0;
@@ -331,9 +327,24 @@ public partial class Options
             _videoBitrate = val;
         }
     }
+
     public string? VideoCodec
     {
         get => _videoCodec;
         set { _videoCodec = value; }
+    }
+
+    public int? Width
+    {
+        get => _width;
+        set
+        {
+            int val = value ?? _width ?? _videoStream.Width;
+
+            if (val > 4096) val = 4096;
+            if (val < 1) val = 1;
+
+            _width = val;
+        }
     }
 }
