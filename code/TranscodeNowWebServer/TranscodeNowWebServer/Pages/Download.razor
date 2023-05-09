@@ -1,12 +1,23 @@
 ﻿@page "/download"
 @using TranscodeNowWebServer.Interfaces
-@inject IWebHostEnvironment env
-@inject IUploadedFileService fileService
 @inject IUserOptions userOptionsService
 @inject IJSRuntime js
-<h3>Download</h3>
-<button class="btn btn-primary" @onclick="DownloadFileFromURL">
-    Download File From URL
-</button>
 
-
+<div class="container">
+    <div class="card mb-3">
+        <div class="card-header">
+            Your file is ready to download!
+        </div>
+        <div class="card-body">
+            <button type="button" class="btn btn-primary" @onclick="DownloadFileFromURL">Click me to download @userOptionsService.UserOptions.GeneralOptions.OutputFileName</button>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-header">
+            Thank you for using TranscodeNow!
+        </div>
+        <div class="card-body">
+            Click <a href="index">here</a> to go to the home page or <a href="upload">here</a> to upload a file.
+        </div>
+    </div>
+</div>
