@@ -1,4 +1,4 @@
-﻿@page "/result"
+﻿@page "/transcode"
 @using TranscodeNowWebServer.Interfaces
 @inject IJSRuntime jsRuntime
 @inject IHttpContextAccessor HttpContextAccessor
@@ -6,4 +6,17 @@
 @inject IUserOptions userOptions
 @inject IWebHostEnvironment env
 @inject NavigationManager nav
-<h3>Result</h3>
+<h1>Your file is being transcoded!</h1>
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <p>
+                        Hang tight! Your file is being transcoded. This may take a while, depending on the size of your file and the settings you chose. When your file is ready, you will be automatically taken to the download page.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

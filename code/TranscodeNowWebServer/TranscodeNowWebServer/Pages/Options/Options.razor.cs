@@ -77,7 +77,7 @@ public partial class Options
             );
 
         SendTranscodeMessage(msg);
-        navManager.NavigateTo("result");
+        navManager.NavigateTo("transcode");
     }
 
     private void SendTranscodeMessage(MqqtTranscodeMessage msg)
