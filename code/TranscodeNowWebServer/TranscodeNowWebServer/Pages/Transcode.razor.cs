@@ -16,7 +16,7 @@ public partial class Transcode
     {
         base.OnInitialized();
         _userOptions = userOptions.UserOptions;
-        var model = UploadedFileService.UploadedFileModel;
+        var model = fileService.UploadedFileModel;
 
         if (model == null)
         {
