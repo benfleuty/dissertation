@@ -19,7 +19,6 @@ public class VideoOptions
     private double? _frameRate;
     private int? _height;
     private bool _hFlip = false;
-    private string? _outputFormat;          // TODO: IMPLEMENT
     private int? _rotation;
     private int? _startTimeHours;
     private int? _startTimeMinutes;
@@ -31,15 +30,6 @@ public class VideoOptions
     public VideoOptions(VideoStream videoStream)
     {
         _videoStream = videoStream;
-        //EndTimeHours = videoStream.Duration.Hours;
-        //EndTimeMinutes = videoStream.Duration.Minutes;
-        //EndTimeSeconds = videoStream.Duration.Seconds;
-        //FrameRate = videoStream.FrameRate;
-        //Height = videoStream.Height;
-        //Rotation = videoStream.Rotation;
-        //Height = videoStream.Height;
-        //Width = videoStream.Width;
-        //BitRate = (int)(videoStream.BitRate / 1000);
     }
 
     public int? CropBottom
@@ -142,7 +132,6 @@ public class VideoOptions
             if (value is null) { _endTimeMinutes = null; return; }
             int result = value.Value;
             if (value < 0) result = 0;
-            else if (value > 10) result = 10;
 
             if (result < StartTimeMinutes &&
                 EndTimeHours <= StartTimeHours)
@@ -160,7 +149,6 @@ public class VideoOptions
             if (value is null) { _endTimeSeconds = null; return; }
             int result = value.Value;
             if (value < 0) result = 0;
-            else if (value > 10) result = 10;
 
             if (result < StartTimeSeconds &&
                 (EndTimeHours <= StartTimeHours || EndTimeMinutes <= StartTimeMinutes))
@@ -204,11 +192,6 @@ public class VideoOptions
         {
             _hFlip = value;
         }
-    }
-    public string? OutputFormat
-    {
-        get => _outputFormat;
-        set { _outputFormat = value; }
     }
 
     public int? Rotation
