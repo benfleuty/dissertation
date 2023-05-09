@@ -90,7 +90,6 @@ internal class Program
                 return;
             }
             Console.WriteLine($"Got command {command}");
-
             var fileName = data.FileModel.RandomFileName;
             if (fileName == null)
             {
@@ -211,7 +210,8 @@ internal class Program
 
     private static void GetVideoCommands(ref List<string> commandParts, Videooptions options)
     {
-
+        List<string> dashVf = new();
+        // height and width
         if (options.Height.HasValue && options.Width.HasValue)
         {
             if (options.Height < 1 || options.Width < 1)
@@ -219,9 +219,72 @@ internal class Program
                 Console.WriteLine($"{Now} Invalid height or width {options.Width}x{options.Height}");
                 return;
             }
-
-            commandParts.Add($"-vf scale={options.Width}:{options.Height}");
+            string res = $"scale={options.Width}:{options.Height}";
+            dashVf.Add(res);
         }
+
+        if (options.CropBottom.HasValue ||
+            options.CropLeft.HasValue ||
+            options.CropRight.HasValue ||
+            options.CropTop.HasValue)
+        {
+            int top = options.CropTop ?? 0;
+            int bottom = options.CropBottom ?? 0;
+            int left = options.CropLeft ?? 0;
+            int right = options.CropRight ?? 0;
+            string crop = $"crop=in_w-{left}-{right}:in_h-{top}-{bottom}:{left}:{top}";
+            dashVf.Add(crop);
+        }
+
+        bool hasStartTime = options.StartTimeHours.HasValue && options.StartTimeMinutes.HasValue && options.StartTimeSeconds.HasValue;
+        bool hasEndTime = options.EndTimeHours.HasValue && options.EndTimeMinutes.HasValue && options.EndTimeSeconds.HasValue;
+
+        if (hasStartTime || hasEndTime)
+        {
+            string startTime = hasStartTime ? $"{options.StartTimeHours}:{options.StartTimeMinutes}:{options.StartTimeSeconds}" : "00:00:00";
+            string? endTime = hasEndTime ? $"{options.EndTimeHours}:{options.EndTimeMinutes}:{options.EndTimeSeconds}" : null;
+
+            string startTimeCmd = $"-ss {startTime}";
+            string endTimeCmd = endTime is not null ? $"-to {endTime}" : string.Empty;
+
+            string time = $"{startTimeCmd} {endTimeCmd}";
+            commandParts.Add(time);
+        }
+
+        if (options.FrameRate.HasValue)
+        {
+            int frameRate = options.FrameRate.Value;
+            string framerate = $"-r {frameRate}";
+            commandParts.Add(framerate);
+        }
+
+        if (options.HFlip.HasValue || options.VFlip.HasValue)
+        {
+            if (options.HFlip.HasValue && options.HFlip.Value)
+            {
+                dashVf.Add("hflip");
+            }
+
+            if (options.VFlip.HasValue && options.VFlip.Value)
+            {
+                dashVf.Add("vflip");
+            }
+        }
+
+        if (options.Rotation.HasValue)
+        {
+            string rotate = $"rotate=angle={options.Rotation}*PI/180";
+            dashVf.Add(rotate);
+        }
+
+        if (options.BitRate.HasValue)
+        {
+            string bitRate = $"-b:v {options.BitRate}k";
+            commandParts.Add(bitRate);
+        }
+
+        string allDashVf = $"-vf \"{string.Join(",", dashVf)}\"";
+        commandParts.Add(allDashVf);
     }
 
     static string GetOutputFileName(string fileName) => "transcoded_" + fileName;
@@ -318,10 +381,10 @@ public class Generaloptions
 
 public class Videooptions
 {
-    public object? CropBottom { get; set; }
-    public object? CropLeft { get; set; }
-    public object? CropRight { get; set; }
-    public object? CropTop { get; set; }
+    public int? CropBottom { get; set; }
+    public int? CropLeft { get; set; }
+    public int? CropRight { get; set; }
+    public int? CropTop { get; set; }
     public int? EndTimeHours { get; set; }
     public int? EndTimeMinutes { get; set; }
     public int? EndTimeSeconds { get; set; }
