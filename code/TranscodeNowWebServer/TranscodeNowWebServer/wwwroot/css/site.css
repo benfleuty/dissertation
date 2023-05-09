@@ -9,6 +9,22 @@
         cursor: pointer;
     }
 
+
+.card-header {
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+/* https://www.geeksforgeeks.org/how-to-get-circular-buttons-in-bootstrap-4/ */
+.btn-circle.btn-sm {
+    width: 15px;
+    height: 15px;
+    padding: 6px 0px;
+    border-radius: 15px;
+    font-size: 8px;
+    text-align: center;
+}
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }

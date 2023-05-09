@@ -132,7 +132,7 @@ public partial class Options
         // General Settings
         { "filename",
             ("File name",
-            new( "This is the file name that will be give to the file that we transcode and send back to you. By default, we prepend <em>transcoded_</em> to the filename." ))
+            new( "This is the file name that will be give to the file that we transcode and send back to you. If you leave this input blank, we will generate a random file name and prepend it with <em>transcoded_</em>." ))
         },
         { "fileOutput",
             ("Output File Type",
