@@ -3,29 +3,50 @@
 @inject IWebHostEnvironment env
 @inject NavigationManager nav
 @inject IUserOptions userOptionsService
+@inject IUploadedFileService fileService
 @inject IJSRuntime js
-
-<div class="container">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card mb-3 text-center">
-                <div class="card-header">
-                    Your file is ready to download!
-                </div>
-                <div class="card-body">
-                    <button type="button" class="btn btn-primary" @onclick="DownloadFileFromURL">Click me to download @userOptionsService.UserOptions.GeneralOptions.OutputFileName</button>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card mb-3 text-center">
-                <div class="card-header">
-                    Thank you for using TranscodeNow!
-                </div>
-                <div class="card-body">
-                    Click <a href="/">here</a> to go to the home page or <a href="upload">here</a> to upload a file.
+@if (fileService.UploadedFileModel is null)
+{
+    <div class="container">
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="mx-auto align-items-center justify-content-center">
+                    <p>
+                        You appear to be here without selecting a file. Please go back to the <a href="/upload">upload page</a> and select a file.
+                    </p>
+                    <p>
+                        If you refreshed the page, you will need to re-upload your file.
+                    </p>
+                    <a href="/upload" class="btn btn-primary">Try again</a>
                 </div>
             </div>
         </div>
     </div>
-</div>
+}
+else
+{
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-3 text-center">
+                    <div class="card-header">
+                        Your file is ready to download!
+                    </div>
+                    <div class="card-body">
+                        <button type="button" class="btn btn-primary" @onclick="DownloadFileFromURL">Click me to download @userOptionsService.UserOptions.GeneralOptions.OutputFileName</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card mb-3 text-center">
+                    <div class="card-header">
+                        Thank you for using TranscodeNow!
+                    </div>
+                    <div class="card-body">
+                        Click <a href="/">here</a> to go to the home page or <a href="upload">here</a> to upload a file.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

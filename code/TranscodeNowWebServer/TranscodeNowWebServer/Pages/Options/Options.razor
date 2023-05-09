@@ -9,8 +9,21 @@
 
 @if (fileService.UploadedFileModel is null)
 {
-    <p>error. fileService is null</p>
-    <a href="/upload" class="btn btn-primary">Try again</a>
+    <div class="container">
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="mx-auto align-items-center justify-content-center">
+                    <p>
+                        You appear to be here without selecting a file. Please go back to the <a href="/upload">upload page</a> and select a file.
+                    </p>
+                    <p>
+                        If you refreshed the page, you will need to re-upload your file.
+                    </p>
+                    <a href="/upload" class="btn btn-primary">Try again</a>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 else
 {
