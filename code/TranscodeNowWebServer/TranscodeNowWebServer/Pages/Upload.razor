@@ -10,21 +10,13 @@
 @if (CurrentStep == Steps.GetUserFile)
 {
     <h1 class="text-center">Upload your file!</h1>
-    @if (string.IsNullOrEmpty(Message) == false)
-    {
-        <p class="text-center mx-2 bg-danger text-white fw-bold">@Message</p>
-    }
     <p class="text-center mx-2">First, we need to know what type of file you are working with.</p>
 
     <div class="container">
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <div class="mx-auto align-items-center justify-content-center">
-                            <DragAndDrop OnChange="OnSelectedFileChange" />
-                        </div>
-                    </div>
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="mx-auto align-items-center justify-content-center">
+                    <DragAndDrop OnChange="OnSelectedFileChange" />
                 </div>
             </div>
         </div>
@@ -35,19 +27,20 @@ else if (CurrentStep == Steps.VerifyFile)
 {
     <h1 class="text-center">Verifying your file!</h1>
     <div class="container">
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <p class="text-center mx-2">We need to check that we support the file that you are uploading:</p>
-                        <p>@Progress% complete</p>
+        <div class="card mb-3">
+            <div class="card-body">
+                @if (string.IsNullOrEmpty(Message) == true)
+                {
+                    <p class="text-center mx-2">We need to check that we support the file that you are uploading:</p>
+                    <p>@Progress% complete</p>
+                }
 
-                        @if (string.IsNullOrEmpty(Message) == false)
-                        {
-                            <p>@Message</p>
-                        }
-                    </div>
-                </div>
+
+                @if (string.IsNullOrEmpty(Message) == false)
+                {
+                    <p>@Message</p>
+                    <button class="btn btn-outline-primary btn-block text-center" @onclick="@(()=>CurrentStep=Steps.GetUserFile)">Try again</button>
+                }
             </div>
         </div>
     </div>
