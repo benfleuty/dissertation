@@ -7,6 +7,7 @@ using FluentFTP;
 using System.Net;
 using Microsoft.Extensions.Configuration;
 using TranscodeServerApp;
+using FFMpegCore.Arguments;
 
 internal class Program
 {
@@ -199,6 +200,14 @@ internal class Program
         }
         else Console.WriteLine("Skipping video commands");
 
+        if (options.AudioOptions is not null)
+        {
+            Console.WriteLine("Getting audio commands");
+            GetAudioCommands(ref commandParts, options.AudioOptions);
+            Console.WriteLine("Got audio commands");
+        }
+        else Console.WriteLine("Skipping audio commands");
+
         // output file name as last parameter
         string outputFileName = GetOutputFileName(model.RandomFileName);
         commandParts.Add(outputFileName);
@@ -235,13 +244,13 @@ internal class Program
             dashVf.Add(crop);
         }
 
-        bool hasStartTime = options.StartTimeHours.HasValue && options.StartTimeMinutes.HasValue && options.StartTimeSeconds.HasValue;
-        bool hasEndTime = options.EndTimeHours.HasValue && options.EndTimeMinutes.HasValue && options.EndTimeSeconds.HasValue;
+        bool hasStartTime = options.StartTimeHours.HasValue || options.StartTimeMinutes.HasValue || options.StartTimeSeconds.HasValue;
+        bool hasEndTime = options.EndTimeHours.HasValue || options.EndTimeMinutes.HasValue || options.EndTimeSeconds.HasValue;
 
         if (hasStartTime || hasEndTime)
         {
-            string startTime = hasStartTime ? $"{options.StartTimeHours}:{options.StartTimeMinutes}:{options.StartTimeSeconds}" : "00:00:00";
-            string? endTime = hasEndTime ? $"{options.EndTimeHours}:{options.EndTimeMinutes}:{options.EndTimeSeconds}" : null;
+            string startTime = hasStartTime ? $"{options.StartTimeHours ?? 0}:{options.StartTimeMinutes ?? 0}:{options.StartTimeSeconds ?? 0}" : "00:00:00";
+            string? endTime = hasEndTime ? $"{options.EndTimeHours ?? 0}:{options.EndTimeMinutes ?? 0}:{options.EndTimeSeconds ?? 0}" : null;
 
             string startTimeCmd = $"-ss {startTime}";
             string endTimeCmd = endTime is not null ? $"-to {endTime}" : string.Empty;
@@ -288,6 +297,49 @@ internal class Program
             commandParts.Add(allDashVf);
         }
     }
+
+    private static void GetAudioCommands(ref List<string> commandParts, Audiooptions options)
+    {
+        if (options.RemoveTrack.HasValue && options.RemoveTrack.Value)
+        {
+            string removeTrack = "-an";
+            commandParts.Add(removeTrack);
+            return;
+        }
+
+        List<string> dashAf = new();
+
+        if (options.Bitrate.HasValue)
+        {
+            string bitRate = $"-b:a {options.Bitrate}k";
+            commandParts.Add(bitRate);
+        }
+
+        if (options.Normalize.HasValue && options.Normalize.Value)
+        {
+            string normalize = "loudnorm=I=-23:TP=-1:LRA=11";
+            dashAf.Add(normalize);
+        }
+
+        if (options.Channels.HasValue)
+        {
+            string channels = $"-ac {options.Channels.Value}";
+            commandParts.Add(channels);
+        }
+
+        //if (options.SampleRate.HasValue)
+        //{
+        //    string sampleRate = $"-ar {options.SampleRate.Value}k";
+        //    commandParts.Add(sampleRate);
+        //}
+
+        if (dashAf.Count > 0)
+        {
+            string allDashAf = $"-vf \"{string.Join(",", dashAf)}\"";
+            commandParts.Add(allDashAf);
+        }
+    }
+
 
     static string GetOutputFileName(string fileName) => "transcoded_" + fileName;
 

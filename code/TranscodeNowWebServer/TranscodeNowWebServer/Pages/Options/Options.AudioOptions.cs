@@ -14,14 +14,11 @@ public class AudioOptions
 
     private bool _removeTrack;
 
-    private int? _sampleRate;
+    //private int? _sampleRate;
 
     public AudioOptions(AudioStream audioStream)
     {
         _audioStream = audioStream;
-        //AudioBitrate = (int)(_audioStream.BitRate / 1000);
-        //Channels = _audioStream.Channels;
-        //SampleRate = _audioStream.SampleRateHz / 1000;
     }
     public int? AudioBitrate
     {
@@ -51,9 +48,9 @@ public class AudioOptions
         get { return _removeTrack; }
         set { _removeTrack = value; }
     }
-    public int? SampleRate
-    {
-        get { return _sampleRate; }
-        set { _sampleRate = value; }
-    }
+    //public int? SampleRate
+    //{
+    //    get { return _sampleRate; }
+    //    set { _sampleRate = value; }
+    //}
 }

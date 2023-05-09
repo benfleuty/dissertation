@@ -42,12 +42,17 @@ public partial class Options
         {
             InitialVideoStream = file.VideoStreams.First();
             _videoOptions = new(InitialVideoStream);
+            _generalOptions.OutputType = GeneralOptions.OutputTypes.Video;
         }
 
         if(file.AudioStreams.Any())
         {
             InitialAudioStream = file.AudioStreams.First();
             _audioOptions = new(InitialAudioStream);
+            if(InitialVideoStream is null)
+            {
+                _generalOptions.OutputType = GeneralOptions.OutputTypes.Audio;
+            }
         }
 
         if (InitialVideoStream is null && InitialAudioStream is null)
@@ -149,11 +154,11 @@ public partial class Options
         { "removeAudio",
             ("Remove Audio Track",
             new( "This option will remove the audio track from the video. The resulting track will be silent." ))
-        },
-        { "sampleRate",
-            ("Sample Rate",
-            new( "Sample rate is the number of times per second an audio signal is measured, or sampled, to create a digital representation of the sound. It is measured in samples per second, or Hertz (Hz). A higher sample rate captures more details and provides better audio quality, but it also requires more storage space and processing power.<br/><br/>Examples of sample rates and their uses:<ul class=\"list-group\"> <li class=\"list-group-item\"> Low sample rate (8,000 Hz) - This is used for low-quality audio, like telephone calls or low-bitrate voice recordings. Audio may sound muffled or lack detail at this level.</li><li class=\"list-group-item\"> Medium sample rate (22,050 Hz) - This sample rate offers better audio quality, suitable for basic music or sound effects. It provides a balance between sound quality and file size.</li><li class=\"list-group-item\"> High sample rate (44,100 Hz) - This is the most common sample rate used for CD-quality audio, providing clear sound and good detail. It is often used for music, podcasts, and other digital audio recordings.</li><li class=\"list-group-item\"> Very high sample rate (48,000 Hz or higher) - This sample rate is used for professional audio production, like film soundtracks, high-quality music, or broadcasting. It offers excellent sound quality and captures more subtle details, but requires more storage space and processing power.</li></ul>" ))
-        }
+        }//,
+        //{ "sampleRate",
+        //    ("Sample Rate",
+        //    new( "Sample rate is the number of times per second an audio signal is measured, or sampled, to create a digital representation of the sound. It is measured in samples per second, or Hertz (Hz). A higher sample rate captures more details and provides better audio quality, but it also requires more storage space and processing power.<br/><br/>Examples of sample rates and their uses:<ul class=\"list-group\"> <li class=\"list-group-item\"> Low sample rate (8,000 Hz) - This is used for low-quality audio, like telephone calls or low-bitrate voice recordings. Audio may sound muffled or lack detail at this level.</li><li class=\"list-group-item\"> Medium sample rate (22,050 Hz) - This sample rate offers better audio quality, suitable for basic music or sound effects. It provides a balance between sound quality and file size.</li><li class=\"list-group-item\"> High sample rate (44,100 Hz) - This is the most common sample rate used for CD-quality audio, providing clear sound and good detail. It is often used for music, podcasts, and other digital audio recordings.</li><li class=\"list-group-item\"> Very high sample rate (48,000 Hz or higher) - This sample rate is used for professional audio production, like film soundtracks, high-quality music, or broadcasting. It offers excellent sound quality and captures more subtle details, but requires more storage space and processing power.</li></ul>" ))
+        //}
     };
 
     private string ModalTitle = "No option selected";
