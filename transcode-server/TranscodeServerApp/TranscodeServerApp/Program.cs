@@ -282,8 +282,11 @@ internal class Program
             commandParts.Add(bitRate);
         }
 
-        string allDashVf = $"-vf \"{string.Join(",", dashVf)}\"";
-        commandParts.Add(allDashVf);
+        if (dashVf.Count > 0)
+        {
+            string allDashVf = $"-vf \"{string.Join(",", dashVf)}\"";
+            commandParts.Add(allDashVf);
+        }
     }
 
     static string GetOutputFileName(string fileName) => "transcoded_" + fileName;
