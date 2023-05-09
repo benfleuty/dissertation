@@ -21,26 +21,25 @@ public class VideoOptions
     private bool _hFlip = false;
     private string? _outputFormat;          // TODO: IMPLEMENT
     private int? _rotation;
-    private int? _startTimeHours = 0;
-    private int? _startTimeMinutes = 0;
-    private int? _startTimeSeconds = 0;
+    private int? _startTimeHours;
+    private int? _startTimeMinutes;
+    private int? _startTimeSeconds;
     private bool _vFlip = false;
     private long? _bitrate;
-    private string? _codec;            // TODO: IMPLEMENT
     private int? _width;
 
     public VideoOptions(VideoStream videoStream)
     {
         _videoStream = videoStream;
-        EndTimeHours = videoStream.Duration.Hours;
-        EndTimeMinutes = videoStream.Duration.Minutes;
-        EndTimeSeconds = videoStream.Duration.Seconds;
-        FrameRate = videoStream.FrameRate;
-        Height = videoStream.Height;
-        Rotation = videoStream.Rotation;
-        Height = videoStream.Height;
-        Width = videoStream.Width;
-        BitRate = (int)(videoStream.BitRate / 1000);
+        //EndTimeHours = videoStream.Duration.Hours;
+        //EndTimeMinutes = videoStream.Duration.Minutes;
+        //EndTimeSeconds = videoStream.Duration.Seconds;
+        //FrameRate = videoStream.FrameRate;
+        //Height = videoStream.Height;
+        //Rotation = videoStream.Rotation;
+        //Height = videoStream.Height;
+        //Width = videoStream.Width;
+        //BitRate = (int)(videoStream.BitRate / 1000);
     }
 
     public int? CropBottom
@@ -160,8 +159,7 @@ public class VideoOptions
         {
             if (value is null) { _endTimeSeconds = null; return; }
             int result = value.Value;
-            if (string.IsNullOrEmpty(result.ToString())) result = 0;
-            else if (value < 0) result = 0;
+            if (value < 0) result = 0;
             else if (value > 10) result = 10;
 
             if (result < StartTimeSeconds &&
@@ -218,6 +216,7 @@ public class VideoOptions
         {
             int val = value ?? _rotation ?? _videoStream.Rotation;
 
+            if (val == 0) { _rotation = null; return; }
             if (val < 0) val += 360;
             if (val > 359) val = 359;
 
@@ -236,6 +235,8 @@ public class VideoOptions
             else if (value > 10) result = 10;
 
             _startTimeHours = result;
+            int total = StartTimeHours.GetValueOrDefault(0) + StartTimeMinutes.GetValueOrDefault(0) + StartTimeSeconds.GetValueOrDefault(0);
+            if (total == 0) StartTimeHours = StartTimeMinutes = StartTimeSeconds = null;
         }
     }
 
@@ -256,6 +257,8 @@ public class VideoOptions
                 if (result > fileTime.Minutes) result = fileTime.Minutes;
             }
             _startTimeMinutes = result;
+            int total = StartTimeHours.GetValueOrDefault(0) + StartTimeMinutes.GetValueOrDefault(0) + StartTimeSeconds.GetValueOrDefault(0);
+            if (total == 0) StartTimeHours = StartTimeMinutes = StartTimeSeconds = null;
         }
     }
 
@@ -268,8 +271,7 @@ public class VideoOptions
             int result = value.Value;
             TimeSpan fileTime = _videoStream.Duration;
             int mins = fileTime.Minutes;
-            if (string.IsNullOrEmpty(result.ToString())) result = 0;
-            else if (value < 0) result = 0;
+            if (value < 0) result = 0;
             else if (value > 59) result = 59;
 
             if (mins == 0)
@@ -277,6 +279,8 @@ public class VideoOptions
                 if (result > fileTime.Seconds) result = fileTime.Seconds;
             }
             _startTimeSeconds = result;
+            int total = StartTimeHours.GetValueOrDefault(0) + StartTimeMinutes.GetValueOrDefault(0) + StartTimeSeconds.GetValueOrDefault(0);
+            if (total == 0) StartTimeHours = StartTimeMinutes = StartTimeSeconds = null;
         }
     }
 
@@ -301,12 +305,6 @@ public class VideoOptions
 
             _bitrate = val;
         }
-    }
-
-    public string? VideoCodec
-    {
-        get => _codec;
-        set { _codec = value; }
     }
 
     public int? Width

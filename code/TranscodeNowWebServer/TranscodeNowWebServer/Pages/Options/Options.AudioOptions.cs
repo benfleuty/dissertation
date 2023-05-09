@@ -19,9 +19,9 @@ public class AudioOptions
     public AudioOptions(AudioStream audioStream)
     {
         _audioStream = audioStream;
-        AudioBitrate = (int)(_audioStream.BitRate / 1000);
-        Channels = _audioStream.Channels;
-        SampleRate = _audioStream.SampleRateHz / 1000;
+        //AudioBitrate = (int)(_audioStream.BitRate / 1000);
+        //Channels = _audioStream.Channels;
+        //SampleRate = _audioStream.SampleRateHz / 1000;
     }
     public int? AudioBitrate
     {

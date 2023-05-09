@@ -82,7 +82,9 @@ public partial class Options
             fileService.UploadedFileModel,
             userOptionsService.UserOptions
             );
-
+        string message = JsonSerializer.Serialize(msg);
+        Console.WriteLine(message);
+        return;
         SendTranscodeMessage(msg);
         navManager.NavigateTo("result");
     }
