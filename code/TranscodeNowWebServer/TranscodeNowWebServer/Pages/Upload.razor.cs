@@ -38,12 +38,6 @@ public partial class Upload
         }
     }
 
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-        fileService = null;
-    }
-
     private async Task OnSelectedFileChange(InputFileChangeEventArgs e)
     {
         CurrentStep = Steps.VerifyFile;
