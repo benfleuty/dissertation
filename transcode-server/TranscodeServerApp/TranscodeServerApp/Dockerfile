@@ -17,4 +17,6 @@ RUN dotnet publish "TranscodeServerApp.csproj" -c Release -o /app/publish /p:Use
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+COPY --from=mwader/static-ffmpeg:6.0 /ffmpeg /usr/local/bin/
+COPY --from=mwader/static-ffmpeg:6.0 /ffprobe /usr/local/bin/
 ENTRYPOINT ["dotnet", "TranscodeServerApp.dll"]

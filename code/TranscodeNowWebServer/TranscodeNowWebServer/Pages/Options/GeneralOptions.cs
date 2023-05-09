@@ -4,27 +4,55 @@ namespace TranscodeNowWebServer.Pages.Options;
 
 public class GeneralOptions
 {
-	private string? _outputFileName;
+    private AudioFormats _audioFormat;
+    private string? _outputFileName;
 
-	public string? OutputFileName
-	{
-		get { return _outputFileName; }
-		set { _outputFileName = value; }
-	}
+    private OutputTypes _outputType;
 
-	private OutputTypes _outputType;
+    private VideoFormats _videoFormat;
 
-	[JsonConverter(typeof(JsonStringEnumConverter))]
-	public OutputTypes OutputType
-	{
-		get { return _outputType; }
-		set { _outputType = value; }
-	}
+    public enum AudioFormats
+    {
+        mp3,
+        wav,
+        ogg
+    }
 
+    public enum OutputTypes
+    {
+        Audio,
+        Video
+    }
 
-	public enum OutputTypes
-	{
-		Audio,
-		Video
-	}
+    public enum VideoFormats
+    {
+        mp4,
+        mkv,
+        webm
+    }
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public AudioFormats AudioFormat
+    {
+        get { return _audioFormat; }
+        set { _audioFormat = value; }
+    }
+
+    public string? OutputFileName
+    {
+        get { return _outputFileName; }
+        set { _outputFileName = value; }
+    }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public OutputTypes OutputType
+    {
+        get { return _outputType; }
+        set { _outputType = value; }
+    }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public VideoFormats VideoFormat
+    {
+        get { return _videoFormat; }
+        set { _videoFormat = value; }
+    }
 }

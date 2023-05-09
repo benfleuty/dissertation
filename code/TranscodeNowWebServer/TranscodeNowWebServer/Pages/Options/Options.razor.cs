@@ -1,13 +1,10 @@
 using FFMpegCore;
 using RabbitMQ.Client;
-using System.Reflection;
 using System.Text.Json;
 using System.Text;
 using TranscodeNowWebServer.Data;
 using Microsoft.JSInterop;
-using TranscodeNowWebServer.Interfaces;
 using Microsoft.AspNetCore.Components;
-using FFMpegCore.Enums;
 
 namespace TranscodeNowWebServer.Pages.Options;
 
@@ -32,25 +29,24 @@ public partial class Options
         SetInitialValues();
     }
 
-    private void SetImageResolution(int width, int height)
-    {
-        _videoOptions!.Width = width;
-        _videoOptions!.Height = height;
-    }
-
     private void SetInitialValues()
     {
         var file = fileService.UploadedFileModel.Data!;
-        if(file.VideoStreams.Any())
+        if (file.VideoStreams.Any())
         {
             InitialVideoStream = file.VideoStreams.First();
             _videoOptions = new(InitialVideoStream);
+            _generalOptions.OutputType = GeneralOptions.OutputTypes.Video;
         }
 
-        if(file.AudioStreams.Any())
+        if (file.AudioStreams.Any())
         {
             InitialAudioStream = file.AudioStreams.First();
             _audioOptions = new(InitialAudioStream);
+            if (InitialVideoStream is null)
+            {
+                _generalOptions.OutputType = GeneralOptions.OutputTypes.Audio;
+            }
         }
 
         if (InitialVideoStream is null && InitialAudioStream is null)
@@ -69,10 +65,10 @@ public partial class Options
             return;
         }
 
-        //if (!IsChangesMade()) return;
-
         userOptionsService.UserOptions =
-            GetSelectedOptions(/*InitialVideoStream is not null, InitialAudioStream is not null*/);
+            GetSelectedOptions();
+
+        Console.WriteLine(userOptionsService.UserOptions.GeneralOptions.OutputFileName);
 
         var msg = new MqqtTranscodeMessage(
             fileService.UploadedFileModel,
@@ -103,6 +99,30 @@ public partial class Options
             VideoOptions = _videoOptions,
             AudioOptions = _audioOptions
         };
+
+        bool v2a = InitialVideoStream is not null && _generalOptions!.OutputType == GeneralOptions.OutputTypes.Audio;
+        bool a2v = InitialVideoStream is null && _generalOptions!.OutputType == GeneralOptions.OutputTypes.Video;
+
+        string outputName = string.IsNullOrEmpty(_generalOptions!.OutputFileName) ?
+            $"transcoded_{fileService.UploadedFileModel.RandomFileName!}" : _generalOptions!.OutputFileName;
+
+        string ext;
+        if (v2a)
+            ext = _generalOptions.AudioFormat.ToString();
+
+        else if (a2v)
+            ext = _generalOptions.AudioFormat.ToString();
+
+        else if (_generalOptions.OutputType == GeneralOptions.OutputTypes.Audio)
+            ext = _generalOptions.AudioFormat.ToString();
+
+        else
+            ext = _generalOptions.VideoFormat.ToString();
+
+        outputName = Path.ChangeExtension(outputName, ext);
+
+        message.GeneralOptions!.OutputFileName = outputName;
+
         return message;
     }
 
@@ -111,7 +131,7 @@ public partial class Options
         // General Settings
         { "filename",
             ("File name",
-            new( "This is the file name that will be give to the file that we transcode and send back to you. By default, we prepend <em>transcode_</em> to the filename." ))
+            new( "This is the file name that will be give to the file that we transcode and send back to you. By default, we prepend <em>transcoded_</em> to the filename." ))
         },
         { "fileOutput",
             ("Output File Type",
@@ -155,10 +175,22 @@ public partial class Options
             ("Remove Audio Track",
             new( "This option will remove the audio track from the video. The resulting track will be silent." ))
         },
-        { "sampleRate",
-            ("Sample Rate",
-            new( "Sample rate is the number of times per second an audio signal is measured, or sampled, to create a digital representation of the sound. It is measured in samples per second, or Hertz (Hz). A higher sample rate captures more details and provides better audio quality, but it also requires more storage space and processing power.<br/><br/>Examples of sample rates and their uses:<ul class=\"list-group\"> <li class=\"list-group-item\"> Low sample rate (8,000 Hz) - This is used for low-quality audio, like telephone calls or low-bitrate voice recordings. Audio may sound muffled or lack detail at this level.</li><li class=\"list-group-item\"> Medium sample rate (22,050 Hz) - This sample rate offers better audio quality, suitable for basic music or sound effects. It provides a balance between sound quality and file size.</li><li class=\"list-group-item\"> High sample rate (44,100 Hz) - This is the most common sample rate used for CD-quality audio, providing clear sound and good detail. It is often used for music, podcasts, and other digital audio recordings.</li><li class=\"list-group-item\"> Very high sample rate (48,000 Hz or higher) - This sample rate is used for professional audio production, like film soundtracks, high-quality music, or broadcasting. It offers excellent sound quality and captures more subtle details, but requires more storage space and processing power.</li></ul>" ))
+        { "videoFormats",
+            ("Video Formats",
+            new( "<ul class=\"list-group\"> <li class=\"list-group-item\"> MP4 is a widely used and versatile video format that supports both video and audio, as well as subtitles and images. It offers good video quality with relatively small file sizes, making it suitable for streaming, video sharing platforms like YouTube, and playback on a wide range of devices.<br/><br/>Example: Uploading a video to YouTube, watching a movie on a smartphone, or streaming a TV show on a media player.</li><li class=\"list-group-item\"> MKV (Matroska) is a flexible and open-source video format that can store multiple video, audio, and subtitle tracks within a single file. It supports high-quality video codecs like H.264 and H.265, making it suitable for storing high-definition movies, TV shows, or large video collections.<br/><br/>Example: Storing a Blu-ray movie rip with multiple audio tracks and subtitle options or sharing high-quality video files with friends.</li><li class=\"list-group-item\">WebM is an open and royalty-free video format designed specifically for the web. It uses the VP8 or VP9 video codec and Vorbis or Opus audio codec, providing good video quality with smaller file sizes. WebM is optimized for online streaming, HTML5 video playback, and web-based applications.<br/><br/>Example: Embedding a video on a website, streaming a video on a platform like Twitch, or watching a video within a web browser.</li></ul>" ))
+        },
+        { "audioFormats",
+            ("Audio Formats",
+            new( "<ul class=\"list-group\"> <li class=\"list-group-item\">MP3 is a popular and widely used audio format that uses lossy compression, meaning some audio quality is sacrificed for smaller file sizes. MP3 is suitable for music streaming, digital audio players, and sharing audio files without taking up too much storage space.<br/><br/>Example: Downloading a song from a music store, listening to a podcast on a smartphone, or streaming music online.</li><li class=\"list-group-item\">OGG (Ogg Vorbis)is an open-source and royalty-free audio format that provides better compression and sound quality than MP3 at similar bitrates. It is suitable for streaming audio, video games, and web-based applications that require high-quality audio with smaller file sizes.<br/><br/>Example: Embedding background music in a website, using sound effects in a video game, or streaming audio on an internet radio station.</li><li class=\"list-group-item\">WAV (Waveform Audio File Format) is an uncompressed audio format that provides lossless audio quality, meaning no audio data is lost during the encoding process. However, WAV files are much larger than compressed formats like MP3 or OGG. WAV is suitable for professional audio production, high-quality music archiving, or editing audio files without loss of quality.<br/><br/>Example: Recording a studio session, archiving a vinyl record collection in high quality, or editing a podcast before exporting to a compressed format for distribution.</li></ul>" ))
         }
+        
+        
+        
+        //,
+        //{ "sampleRate",
+        //    ("Sample Rate",
+        //    new( "Sample rate is the number of times per second an audio signal is measured, or sampled, to create a digital representation of the sound. It is measured in samples per second, or Hertz (Hz). A higher sample rate captures more details and provides better audio quality, but it also requires more storage space and processing power.<br/><br/>Examples of sample rates and their uses:<ul class=\"list-group\"> <li class=\"list-group-item\"> Low sample rate (8,000 Hz) - This is used for low-quality audio, like telephone calls or low-bitrate voice recordings. Audio may sound muffled or lack detail at this level.</li><li class=\"list-group-item\"> Medium sample rate (22,050 Hz) - This sample rate offers better audio quality, suitable for basic music or sound effects. It provides a balance between sound quality and file size.</li><li class=\"list-group-item\"> High sample rate (44,100 Hz) - This is the most common sample rate used for CD-quality audio, providing clear sound and good detail. It is often used for music, podcasts, and other digital audio recordings.</li><li class=\"list-group-item\"> Very high sample rate (48,000 Hz or higher) - This sample rate is used for professional audio production, like film soundtracks, high-quality music, or broadcasting. It offers excellent sound quality and captures more subtle details, but requires more storage space and processing power.</li></ul>" ))
+        //}
     };
 
     private string ModalTitle = "No option selected";

@@ -7,7 +7,6 @@ using FluentFTP;
 using System.Net;
 using Microsoft.Extensions.Configuration;
 using TranscodeServerApp;
-using System.Linq.Expressions;
 
 internal class Program
 {
@@ -28,9 +27,9 @@ internal class Program
                 consumer.Received += HandleMessage;
                 channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false);
                 channel.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
+                Console.WriteLine($"{Now}: Listening for messages on queue: {queueName}");
                 while (true)
                 {
-                    Console.WriteLine($"{Now}: Listening for messages on queue: {queueName}");
                     Thread.Sleep(10000);
                 }
             }
@@ -58,129 +57,140 @@ internal class Program
 
     static void OnMessageReceived(string message)
     {
-        //debug catchall 
+        Console.WriteLine($"{Now} Received message: {message}");
+        Rootobject? data;
         try
         {
+            var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            data = JsonSerializer.Deserialize<Rootobject>(message, opts);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"{Now} Exception parsing json: {e.Message}");
+            return;
+        }
 
-            Console.WriteLine($"{Now} Received message: {message}");
-            Rootobject? data;
-            try
-            {
-                var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                data = JsonSerializer.Deserialize<Rootobject>(message, opts);
-                Console.WriteLine(data.UserOptions == null);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"{Now} Exception parsing json: {e.Message}");
-                return;
-            }
-            if (data is null)
-            {
-                Console.WriteLine($"{Now} Received null message");
-                return;
-            }
+        if (data is null)
+        {
+            Console.WriteLine($"{Now} Received null message");
+            return;
+        }
 
-            Console.WriteLine("Getting command");
+        outputName = data.UserOptions.GeneralOptions.OutputFileName;
 
-            string? command = GetCommand(data);
-            if (command is null)
-            {
-                Console.WriteLine($"{Now} Invalid parameter for command");
-                return;
-            }
-            Console.WriteLine($"Got command {command}");
+        Console.WriteLine("Getting command");
 
-            var fileName = data.FileModel.RandomFileName;
-            if (fileName == null)
-            {
-                Console.WriteLine($"{Now} Null file name");
-                return;
-            }
+        string? command = GetCommand(data);
+        if (command is null)
+        {
+            Console.WriteLine($"{Now} Invalid parameter for command");
+            return;
+        }
+        Console.WriteLine($"Got command {command}");
+        var localFileName = data.FileModel.RandomFileName;
+        if (localFileName == null)
+        {
+            Console.WriteLine($"{Now} Null file name");
+            return;
+        }
 
-            Console.WriteLine($"Getting file {fileName}");
-            if (!DownloadFile(fileName))
-            {
-                Console.WriteLine($"{Now} Failed to download file {fileName}");
-                return;
-            }
-            Console.WriteLine($"Got file {fileName}");
+        Console.WriteLine($"Getting file {localFileName}");
+        if (!DownloadFile(localFileName))
+        {
+            Console.WriteLine($"{Now} Failed to download file {localFileName}");
+            return;
+        }
+        Console.WriteLine($"Got file {localFileName}");
 
-            // Create a process to run ffmpeg
-            var process = new Process();
+        // Create a process to run ffmpeg
+        var process = new Process();
 
-            // Configure the process to run ffmpeg with the downloaded file as input
-            process.StartInfo.FileName = "ffmpeg";
-            process.StartInfo.Arguments = command;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.RedirectStandardError = true;
-            // Start the process and wait for it to complete
-            Console.WriteLine($"Start transcode {fileName} to {GetOutputFileName(fileName)} using\n{process.StartInfo.FileName} {process.StartInfo.Arguments}");
-            process.Start();
-            process.WaitForExit();
-            Console.WriteLine($"Transcoded {fileName} to {GetOutputFileName(fileName)}");
+        // Configure the process to run ffmpeg with the downloaded file as input
+        process.StartInfo.FileName = "ffmpeg";
+        process.StartInfo.Arguments = command;
+        process.StartInfo.UseShellExecute = false;
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.RedirectStandardError = true;
+        // Start the process and wait for it to complete
+        Console.WriteLine($"Start transcode {localFileName} to {outputName} using\n{process.StartInfo.FileName} {process.StartInfo.Arguments}");
+        process.Start();
+        process.WaitForExit();
+        Console.WriteLine($"Transcoded {localFileName} to {outputName}");
 
 
-            // Print the output of ffmpeg to the console
-            string stdErr = process.StandardError.ReadToEnd();
-            if (stdErr.Length > 0)
-            {
-                Console.WriteLine($"Std Err: {stdErr}");
-                // todo better error finding/parsing
-            }
+        // Print the output of ffmpeg to the console
+        string stdErr = process.StandardError.ReadToEnd();
+        if (stdErr.Length > 0)
+        {
+            Console.WriteLine($"Std Err: {stdErr}");
+            // todo better error finding/parsing
+        }
 
-            string output = "Transcode complete";
-            if (!File.Exists(fileName))
-            {
-                output = "Failed to transcode";
-            }
+        string output = "Transcode complete";
+        if (!File.Exists(localFileName))
+        {
+            output = "Failed to transcode";
+        }
 
-            Console.WriteLine(output);
+        Console.WriteLine(output);
 
-            Console.WriteLine("Uploading transcoded file");
-            string outFileName = GetOutputFileName(fileName);
-            MqqtTranscodedMessage msg = new();
-            msg.OriginalFileName = fileName;
-            msg.NewFileName = outFileName;
-            msg.State = "Success";
-            if (!UploadFile(outFileName))
-            {
-                Console.WriteLine($"Failed to upload file {outFileName}");
-                msg.State = "Failed";
-                msg.Message = "Failed to upload file";
-            }
+        Console.WriteLine("Uploading transcoded file");
+        MqqtTranscodedMessage msg = new();
+        msg.OriginalFileName = localFileName;
+        msg.NewFileName = outputName;
+        msg.State = "Success";
+        if (!UploadFile(outputName))
+        {
+            Console.WriteLine($"Failed to upload file {outputName}");
+            msg.State = "Failed";
+            msg.Message = "Failed to upload file";
+        }
 
-            try
-            {
-                var factory = new ConnectionFactory() { HostName = "rabbitmq" };
-                using var connection = factory.CreateConnection();
-                using var channel = connection.CreateModel();
+        try
+        {
+            var factory = new ConnectionFactory() { HostName = "rabbitmq" };
+            using var connection = factory.CreateConnection();
+            using var channel = connection.CreateModel();
 
-                string queueName = fileName;
-                var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(msg));
+            string queueName = outputName;
+            var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(msg));
 
-                var arguments = new Dictionary<string, object> { { "x-expires", 100 * 60 * 60 * 24 } };
-                channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: arguments);
+            var arguments = new Dictionary<string, object> { { "x-expires", 100 * 60 * 60 * 24 } };
+            channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: arguments);
 
-                channel.BasicPublish(exchange: "", routingKey: queueName, body: body);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"{Now} Error: {ex.Message}\nFailed to send transcode result to rabbitmq.");
-            }
-
-            Console.WriteLine("finished");
-
+            channel.BasicPublish(exchange: "", routingKey: queueName, body: body);
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Catch all error:\n" + ex.Message);
-            Console.WriteLine(ex.StackTrace);
-            Environment.Exit(1);
+            Console.WriteLine($"{Now} Error: {ex.Message}\nFailed to send transcode result to rabbitmq.");
         }
 
+        try
+        {
+            Console.WriteLine($"Delete {data.FileModel.RandomFileName}");
+            File.Delete(data.FileModel.RandomFileName);
+            Console.WriteLine($"Deleted {data.FileModel.RandomFileName}");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Could not delete {data.FileModel.RandomFileName}: {e.Message}");
+        }
+
+        try
+        {
+            Console.WriteLine($"Delete {outputName}");
+            File.Delete(outputName);
+            Console.WriteLine($"Deleted {outputName}");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Could not delete {outputName}: {e.Message}");
+        }
+
+        Console.WriteLine("finished");
     }
+
+
 
     private static string? GetCommand(Rootobject data)
     {
@@ -190,9 +200,29 @@ internal class Program
         List<string> commandParts = new();
         // command name
         commandParts.Add("-hide_banner");
-        commandParts.Add($"-i {data.FileModel.RandomFileName}");
+        commandParts.Add($"-i {model.RandomFileName}");
 
         // apply user's selected options
+
+        // Get audio commands
+        if (options.AudioOptions is not null)
+        {
+            Console.WriteLine("Getting audio commands");
+            GetAudioCommands(ref commandParts, options.AudioOptions);
+            Console.WriteLine("Got audio commands");
+
+            // If the user is converting from video to audio, we need to add the -vn flag
+            // and set VideoOptions to null. This allows for the audio options to be applied
+            // and the video options to be ignored.
+            if (options.GeneralOptions.OutputType == "Audio" && options.VideoOptions is not null)
+            {
+                commandParts.Add("-vn");
+                options.VideoOptions = null;
+            }
+        }
+        else Console.WriteLine("Skipping audio commands");
+
+        // Get video commands
         if (options.VideoOptions is not null)
         {
             Console.WriteLine("Getting video commands");
@@ -201,17 +231,18 @@ internal class Program
         }
         else Console.WriteLine("Skipping video commands");
 
+
         // output file name as last parameter
-        string outputFileName = GetOutputFileName(model.RandomFileName);
-        commandParts.Add(outputFileName);
-
+        string overwrite = "-y";
+        commandParts.Add(overwrite);
+        commandParts.Add(options.GeneralOptions.OutputFileName);
         return string.Join(" ", commandParts);
-
     }
 
     private static void GetVideoCommands(ref List<string> commandParts, Videooptions options)
     {
-
+        List<string> dashVf = new();
+        // height and width
         if (options.Height.HasValue && options.Width.HasValue)
         {
             if (options.Height < 1 || options.Width < 1)
@@ -219,12 +250,120 @@ internal class Program
                 Console.WriteLine($"{Now} Invalid height or width {options.Width}x{options.Height}");
                 return;
             }
+            string res = $"scale={options.Width}:{options.Height}";
+            dashVf.Add(res);
+        }
 
-            commandParts.Add($"-vf scale={options.Width}:{options.Height}");
+        if (options.CropBottom.HasValue ||
+            options.CropLeft.HasValue ||
+            options.CropRight.HasValue ||
+            options.CropTop.HasValue)
+        {
+            int top = options.CropTop ?? 0;
+            int bottom = options.CropBottom ?? 0;
+            int left = options.CropLeft ?? 0;
+            int right = options.CropRight ?? 0;
+            string crop = $"crop=in_w-{left}-{right}:in_h-{top}-{bottom}:{left}:{top}";
+            dashVf.Add(crop);
+        }
+
+        bool hasStartTime = options.StartTimeHours.HasValue || options.StartTimeMinutes.HasValue || options.StartTimeSeconds.HasValue;
+        bool hasEndTime = options.EndTimeHours.HasValue || options.EndTimeMinutes.HasValue || options.EndTimeSeconds.HasValue;
+
+        if (hasStartTime || hasEndTime)
+        {
+            string startTime = hasStartTime ? $"{options.StartTimeHours ?? 0}:{options.StartTimeMinutes ?? 0}:{options.StartTimeSeconds ?? 0}" : "00:00:00";
+            string? endTime = hasEndTime ? $"{options.EndTimeHours ?? 0}:{options.EndTimeMinutes ?? 0}:{options.EndTimeSeconds ?? 0}" : null;
+
+            string startTimeCmd = $"-ss {startTime}";
+            string endTimeCmd = endTime is not null ? $"-to {endTime}" : string.Empty;
+
+            string time = $"{startTimeCmd} {endTimeCmd}";
+            commandParts.Add(time);
+        }
+
+        if (options.FrameRate.HasValue)
+        {
+            int frameRate = options.FrameRate.Value;
+            string framerate = $"-r {frameRate}";
+            commandParts.Add(framerate);
+        }
+
+        if (options.HFlip.HasValue || options.VFlip.HasValue)
+        {
+            if (options.HFlip.HasValue && options.HFlip.Value)
+            {
+                dashVf.Add("hflip");
+            }
+
+            if (options.VFlip.HasValue && options.VFlip.Value)
+            {
+                dashVf.Add("vflip");
+            }
+        }
+
+        if (options.Rotation.HasValue && options.Rotation > 0)
+        {
+            string rotate = $"rotate=angle={options.Rotation}*PI/180";
+            dashVf.Add(rotate);
+        }
+
+        if (options.BitRate.HasValue)
+        {
+            string bitRate = $"-b:v {options.BitRate}k";
+            commandParts.Add(bitRate);
+        }
+
+        if (dashVf.Count > 0)
+        {
+            string allDashVf = $"-vf \"{string.Join(",", dashVf)}\"";
+            commandParts.Add(allDashVf);
         }
     }
 
-    static string GetOutputFileName(string fileName) => "transcoded_" + fileName;
+    private static void GetAudioCommands(ref List<string> commandParts, Audiooptions options)
+    {
+        if (options.RemoveTrack.HasValue && options.RemoveTrack.Value)
+        {
+            string removeTrack = "-an";
+            commandParts.Add(removeTrack);
+            return;
+        }
+
+        List<string> dashAf = new();
+
+        if (options.Bitrate.HasValue)
+        {
+            string bitRate = $"-b:a {options.Bitrate}k";
+            commandParts.Add(bitRate);
+        }
+
+        if (options.Normalize.HasValue && options.Normalize.Value)
+        {
+            string normalize = "loudnorm=I=-23:TP=-1:LRA=11";
+            dashAf.Add(normalize);
+        }
+
+        if (options.Channels.HasValue)
+        {
+            string channels = $"-ac {options.Channels.Value}";
+            commandParts.Add(channels);
+        }
+
+        //if (options.SampleRate.HasValue)
+        //{
+        //    string sampleRate = $"-ar {options.SampleRate.Value}k";
+        //    commandParts.Add(sampleRate);
+        //}
+
+        if (dashAf.Count > 0)
+        {
+            string allDashAf = $"-vf \"{string.Join(",", dashAf)}\"";
+            commandParts.Add(allDashAf);
+        }
+    }
+
+    static string outputName = string.Empty;
 
     private static FtpClient CreateFtpClient()
     {
@@ -312,16 +451,18 @@ public class Useroptions
 
 public class Generaloptions
 {
-    public object? OutputFileName { get; set; }
+    public string? OutputFileName { get; set; }
     public string? OutputType { get; set; }
+    public string? VideoFormat { get; set; }
+    public string? AudioFormat { get; set; }
 }
 
 public class Videooptions
 {
-    public object? CropBottom { get; set; }
-    public object? CropLeft { get; set; }
-    public object? CropRight { get; set; }
-    public object? CropTop { get; set; }
+    public int? CropBottom { get; set; }
+    public int? CropLeft { get; set; }
+    public int? CropRight { get; set; }
+    public int? CropTop { get; set; }
     public int? EndTimeHours { get; set; }
     public int? EndTimeMinutes { get; set; }
     public int? EndTimeSeconds { get; set; }
@@ -341,11 +482,9 @@ public class Videooptions
 
 public class Audiooptions
 {
-    public object? Channels { get; set; }
-    public object? AudioBitrate { get; set; }
-    public bool? IsCustomBitrate { get; set; }
-    public object? AudioCodec { get; set; }
-    public bool? NormalizeAudio { get; set; }
+    public int? Channels { get; set; }
+    public int? Bitrate { get; set; }
+    public bool? Normalize { get; set; }
     public bool? RemoveTrack { get; set; }
-    public object? SampleRate { get; set; }
+    public int? SampleRate { get; set; }
 }

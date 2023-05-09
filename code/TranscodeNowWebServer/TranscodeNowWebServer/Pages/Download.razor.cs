@@ -6,9 +6,8 @@ public partial class Download
 {
     private async Task DownloadFileFromURL()
     {
-        var fileName = $"transcoded_{fileService.UploadedFileModel.RandomFileName}";
-        var friendlyFileName = $"transcoded_{fileService.UploadedFileModel.OriginalFileName}";
+        var fileName = userOptionsService.UserOptions.GeneralOptions.OutputFileName;
         var fileURL = $"https://localhost/uploads/{fileName}";
-        await js.InvokeVoidAsync("triggerFileDownload", friendlyFileName, fileURL);
+        await js.InvokeVoidAsync("triggerFileDownload", fileName, fileURL);
     }
 }

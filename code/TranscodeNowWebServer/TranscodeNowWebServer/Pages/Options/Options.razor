@@ -16,8 +16,6 @@ else
 {
     <h1 class="text-center">Enter your settings</h1>
     <p class="text-center mx-2">Now we need to know what you want to do to your file:</p>
-
-    <p>File Name: @fileService.UploadedFileModel.OriginalFileName / @fileService.UploadedFileModel.RandomFileName</p>
     <div class="container">
         <div class="row">
             <div class="col-md-12">
@@ -61,14 +59,56 @@ else
                                         }
                                     </InputRadioGroup>
                                 </div>
+                                @if (_generalOptions.OutputType == GeneralOptions.OutputTypes.Video)
+                                {
+                                    <div class="form-group">
+                                        <label for="videoFormats">
+                                            Video Formats
+                                            <span class="help-favicon" @onclick="@(() => HandleHelpClick("videoFormats"))">
+                                                <i class="fas fa-question-circle"></i>
+                                            </span>
+                                        </label>
+                                        <div class="input-group">
+                                            <InputSelect @bind-Value="_generalOptions.VideoFormat" name="videoFormats">
+                                                <option value="">-- Select a value --</option>
+                                                @foreach(var format in Enum.GetValues(typeof(GeneralOptions.VideoFormats)))
+                                                {
+                                                    <option value="@format">@format</option>
+                                                })
+                                            </InputSelect>
+                                        </div>
+                                    </div>
+                                }
+                                else if (_generalOptions.OutputType == GeneralOptions.OutputTypes.Audio)
+                                {
+                                    <div class="form-group">
+                                        <label for="audioFormats">
+                                            Audio Formats
+                                            <span class="help-favicon" @onclick="@(() => HandleHelpClick("audioFormats"))">
+                                                <i class="fas fa-question-circle"></i>
+                                            </span>
+                                        </label>
+                                        <div class="input-group">
+                                            <InputSelect @bind-Value="_generalOptions.AudioFormat" name="audioFormats">
+                                                <option value="">-- Select a value --</option>
+                                                @foreach (var format in Enum.GetValues(typeof(GeneralOptions.AudioFormats)))
+                                                {
+                                                    <option value="@format">@format</option>
+                                                })
+                                            </InputSelect>
+                                        </div>
+                                    </div>
+                                }
                             </div>
                         </EditForm>
                     </div>
                 </div>
 
                 @*Video Settings*@
-                <div class="card mb-3">
-                    <div class="card-header">
+                @if (_videoOptions is not null)
+                {
+                    <div class="card mb-3">
+                        <div class="card-header">
                         Video Settings
                     </div>
                     <div class="card-body">
@@ -87,7 +127,7 @@ else
                                                 Width
                                             </label>
                                             <div class="input-group">
-                                                <InputNumber @bind-Value="_videoOptions.Width" class="form-control" id="width" min="1" max="4096" placeholder="Enter width" />
+                                                <InputNumber @bind-Value="_videoOptions.Width" class="form-control" id="width" min="1" max="4096" placeholder="@InitialVideoStream.Width" />
                                                 <div class="input-group-append">
                                                     <span class="input-group-text">px</span>
                                                 </div>
@@ -100,7 +140,7 @@ else
                                                 Height
                                             </label>
                                             <div class="input-group">
-                                                <InputNumber @bind-Value="_videoOptions.Height" class="form-control" id="height" min="1" max="4096" placeholder="Enter height" />
+                                                <InputNumber @bind-Value="_videoOptions.Height" class="form-control" id="height" min="1" max="4096" placeholder="@InitialVideoStream.Height" />
                                                 <div class="input-group-append">
                                                     <span class="input-group-text">px</span>
                                                 </div>
@@ -116,7 +156,7 @@ else
                                         </span>
                                     </label>
                                     <div class="input-group">
-                                        <InputNumber @bind-Value="_videoOptions.BitRate" class="form-control" id="bitrate" min="1" max="50000" placeholder="Enter bitrate" />
+                                        <InputNumber @bind-Value="_videoOptions.BitRate" class="form-control" id="bitrate" min="1" max="50000" placeholder="@((int)InitialVideoStream.BitRate / 1000)" />
                                         <div class="input-group-append">
                                             <span class="input-group-text">kbps</span>
                                         </div>
@@ -130,7 +170,7 @@ else
                                         </span>
                                     </label>
                                     <div class="input-group">
-                                        <InputNumber @bind-Value="_videoOptions.FrameRate" class="form-control" id="framerate" min="1" max="120" placeholder="Enter framerate" />
+                                        <InputNumber @bind-Value="_videoOptions.FrameRate" class="form-control" id="framerate" min="1" max="120" placeholder="@InitialVideoStream.FrameRate" />
                                         <div class="input-group-append">
                                             <span class="input-group-text">fps</span>
                                         </div>
@@ -224,19 +264,19 @@ else
                                     <div class="row">
                                         <div class="col-sm-4">
                                             <div class="input-group">
-                                                <InputNumber @bind-Value="_videoOptions.StartTimeHours" class="form-control" id="start-time-hours" min="0" max="23" placeholder="HH" />
+                                                <InputNumber @bind-Value="_videoOptions.StartTimeHours" class="form-control" id="start-time-hours" min="0" max="23" placeholder="0" />
                                                 <div class="input-group-append"><span class="input-group-text">h</span></div>
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="input-group">
-                                                <InputNumber @bind-Value="_videoOptions.StartTimeMinutes" class="form-control" id="start-time-minutes" min="0" max="59" placeholder="MM" />
+                                                <InputNumber @bind-Value="_videoOptions.StartTimeMinutes" class="form-control" id="start-time-minutes" min="0" max="59" placeholder="0" />
                                                 <div class="input-group-append"><span class="input-group-text">m</span></div>
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="input-group">
-                                                <InputNumber @bind-Value="_videoOptions.StartTimeSeconds" class="form-control" id="start-time-seconds" min="0" max="59" placeholder="SS" />
+                                                <InputNumber @bind-Value="_videoOptions.StartTimeSeconds" class="form-control" id="start-time-seconds" min="0" max="59" placeholder="0" />
                                                 <div class="input-group-append"><span class="input-group-text">s</span></div>
                                             </div>
                                         </div>
@@ -249,19 +289,19 @@ else
                                     <div class="row">
                                         <div class="col-sm-4">
                                             <div class="input-group">
-                                                <InputNumber @bind-Value="_videoOptions.EndTimeHours" class="form-control" id="end-time-hours" min="0" max="23" placeholder="HH" />
+                                                <InputNumber @bind-Value="_videoOptions.EndTimeHours" class="form-control" id="end-time-hours" min="0" max="23" placeholder="@InitialVideoStream.Duration.Hours" />
                                                 <div class="input-group-append"><span class="input-group-text">h</span></div>
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="input-group">
-                                                <InputNumber @bind-Value="_videoOptions.EndTimeMinutes" class="form-control" id="end-time-minutes" min="0" max="59" placeholder="MM" />
+                                                <InputNumber @bind-Value="_videoOptions.EndTimeMinutes" class="form-control" id="end-time-minutes" min="0" max="59" placeholder="@InitialVideoStream.Duration.Minutes" />
                                                 <div class="input-group-append"><span class="input-group-text">m</span></div>
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="input-group">
-                                                <InputNumber @bind-Value="_videoOptions.EndTimeSeconds" class="form-control" id="end-time-seconds" min="0" max="59" placeholder="SS" />
+                                                <InputNumber @bind-Value="_videoOptions.EndTimeSeconds" class="form-control" id="end-time-seconds" min="0" max="59" placeholder="@InitialVideoStream.Duration.Seconds" />
                                                 <div class="input-group-append"><span class="input-group-text">s</span></div>
                                             </div>
                                         </div>
@@ -271,8 +311,10 @@ else
                         </EditForm>
                     </div>
                 </div>
-
+                }
                 @*Audio Settings*@
+                @if (_audioOptions is not null)
+                {
                 <div class="card mb-3">
                     <div class="card-header">
                         Audio Settings
@@ -289,8 +331,8 @@ else
                                 <div class="input-group">
                                     <InputSelect @bind-Value="_audioOptions.Channels" name="audioOptions">
                                         <option value="">-- Select an option --</option>
-                                        <option class="form-check-input" value="mono" id="mono">Mono / 1 Channel</option>
-                                        <option class="form-check-input" value="stereo" id="stereo">Stereo / 2 channels</option>
+                                        <option class="form-check-input" value="1" id="mono">Mono / 1 Channel</option>
+                                        <option class="form-check-input" value="2" id="stereo">Stereo / 2 channels</option>
                                     </InputSelect>
                                 </div>
                             </div>
@@ -331,33 +373,34 @@ else
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                             </div>
-                            <div class="form-group">
-                                <label for="audioSampleRate">
-                                    Sample Rate
-                                    <span class="help-favicon" @onclick="@(() => HandleHelpClick("sampleRate"))">
-                                        <i class="fas fa-question-circle"></i>
-                                    </span>
-                                </label>
-                                <div class="input-group">
-                                    <InputSelect id="audioSampleRate" @bind-Value="_audioOptions.SampleRate">
-                                        <option value="">-- Select an option --</option>
-                                        <option value="8">8 kHz</option>
-                                        <option value="11">11 kHz</option>
-                                        <option value="16">16 kHz</option>
-                                        <option value="22">22 kHz</option>
-                                        <option value="32">32 kHz</option>
-                                        <option value="44">44 kHz</option>
-                                        <option value="48">48 kHz</option>
-                                        <option value="88">88 kHz</option>
-                                        <option value="96">96 kHz</option>
-                                        <option value="192">192 kHz</option>
-                                    </InputSelect>
+                            @*<div class="form-group">
+                        <label for="audioSampleRate">
+                        Sample Rate
+                        <span class="help-favicon" @onclick="@(() => HandleHelpClick("sampleRate"))">
+                        <i class="fas fa-question-circle"></i>
+                        </span>
+                        </label>
+                        <div class="input-group">
+                        <InputSelect id="audioSampleRate" @bind-Value="_audioOptions.SampleRate">
+                        <option value="">-- Select an option --</option>
+                        <option value="8">8 kHz</option>
+                        <option value="11">11 kHz</option>
+                        <option value="16">16 kHz</option>
+                        <option value="22">22 kHz</option>
+                        <option value="32">32 kHz</option>
+                        <option value="44">44 kHz</option>
+                        <option value="48">48 kHz</option>
+                        <option value="88">88 kHz</option>
+                        <option value="96">96 kHz</option>
+                        <option value="192">192 kHz</option>
+                        </InputSelect>
 
-                                </div>
-                            </div>
+                        </div>
+                        </div>*@
                         </EditForm>
                     </div>
                 </div>
+                }
 
                 @*Summary*@
                 <div class="card mb-3">
