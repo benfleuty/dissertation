@@ -7,7 +7,6 @@ using FluentFTP;
 using System.Net;
 using Microsoft.Extensions.Configuration;
 using TranscodeServerApp;
-using System.Linq.Expressions;
 
 internal class Program
 {
@@ -271,7 +270,7 @@ internal class Program
             }
         }
 
-        if (options.Rotation.HasValue)
+        if (options.Rotation.HasValue && options.Rotation > 0)
         {
             string rotate = $"rotate=angle={options.Rotation}*PI/180";
             dashVf.Add(rotate);
