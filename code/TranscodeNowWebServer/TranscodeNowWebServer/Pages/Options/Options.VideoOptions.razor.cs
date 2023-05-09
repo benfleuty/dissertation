@@ -40,7 +40,7 @@ public class VideoOptions
         Rotation = videoStream.Rotation;
         Height = videoStream.Height;
         Width = videoStream.Width;
-        BitRate = videoStream.BitRate;
+        BitRate = (int)(videoStream.BitRate / 1000);
     }
 
     public int? CropBottom
