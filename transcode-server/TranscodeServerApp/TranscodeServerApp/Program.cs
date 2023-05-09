@@ -80,6 +80,13 @@ internal class Program
                 return;
             }
 
+            var a = data.UserOptions.AudioOptions;
+            Console.WriteLine($"{nameof(a.SampleRate)}:{a.SampleRate.ToString() ?? "null"}");
+            Console.WriteLine($"{nameof(a.Bitrate)}:{a.Bitrate.ToString() ?? "null"}");
+            Console.WriteLine($"{nameof(a.Channels)}:{a.Channels.ToString() ?? "null"}");
+            Console.WriteLine($"{nameof(a.RemoveTrack)}:{a.RemoveTrack.ToString() ?? "null"}");
+            Console.WriteLine($"{nameof(a.Normalize)}:{a.Normalize.ToString() ?? "null"}");
+            return;
             Console.WriteLine("Getting command");
 
             string? command = GetCommand(data);
@@ -374,7 +381,7 @@ public class Useroptions
 
 public class Generaloptions
 {
-    public object? OutputFileName { get; set; }
+    public string? OutputFileName { get; set; }
     public string? OutputType { get; set; }
 }
 
@@ -403,11 +410,9 @@ public class Videooptions
 
 public class Audiooptions
 {
-    public object? Channels { get; set; }
-    public object? AudioBitrate { get; set; }
-    public bool? IsCustomBitrate { get; set; }
-    public object? AudioCodec { get; set; }
-    public bool? NormalizeAudio { get; set; }
+    public int? Channels { get; set; }
+    public int? Bitrate { get; set; }
+    public bool? Normalize { get; set; }
     public bool? RemoveTrack { get; set; }
-    public object? SampleRate { get; set; }
+    public int? SampleRate { get; set; }
 }

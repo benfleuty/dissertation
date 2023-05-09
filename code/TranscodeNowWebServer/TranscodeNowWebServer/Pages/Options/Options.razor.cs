@@ -51,6 +51,10 @@ public partial class Options
         {
             InitialAudioStream = file.AudioStreams.First();
             _audioOptions = new(InitialAudioStream);
+            // iterate each field in audio stream
+            Console.WriteLine(InitialAudioStream.Channels);
+            Console.WriteLine(InitialAudioStream.BitRate);
+            Console.WriteLine(InitialAudioStream.SampleRateHz);
         }
 
         if (InitialVideoStream is null && InitialAudioStream is null)
