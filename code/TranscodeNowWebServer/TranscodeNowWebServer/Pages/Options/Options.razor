@@ -1,6 +1,7 @@
 ﻿@page "/options"
 @using TranscodeNowWebServer.TranscodeComponents
 @inject NavigationManager navManager
+@inject IWebHostEnvironment env
 @inject IJSRuntime js
 @inject Interfaces.IUploadedFileService fileService
 @inject Interfaces.IUserOptions userOptionsService
@@ -115,7 +116,7 @@ else
                                         </span>
                                     </label>
                                     <div class="input-group">
-                                        <InputNumber @bind-Value="_videoOptions.VideoBitrate" class="form-control" id="bitrate" min="1" max="50000" placeholder="Enter bitrate" />
+                                        <InputNumber @bind-Value="_videoOptions.BitRate" class="form-control" id="bitrate" min="1" max="50000" placeholder="Enter bitrate" />
                                         <div class="input-group-append">
                                             <span class="input-group-text">kbps</span>
                                         </div>

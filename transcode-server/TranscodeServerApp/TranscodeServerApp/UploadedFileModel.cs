@@ -1,4 +1,4 @@
-﻿namespace TranscodeNowWebServer.Data;
+﻿namespace TranscodeServerApp;
 
 public class UploadedFileModel
 {

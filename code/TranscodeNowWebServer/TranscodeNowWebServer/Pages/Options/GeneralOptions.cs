@@ -1,4 +1,6 @@
-﻿namespace TranscodeNowWebServer.Pages.Options;
+﻿using System.Text.Json.Serialization;
+
+namespace TranscodeNowWebServer.Pages.Options;
 
 public class GeneralOptions
 {
@@ -12,6 +14,7 @@ public class GeneralOptions
 
 	private OutputTypes _outputType;
 
+	[JsonConverter(typeof(JsonStringEnumConverter))]
 	public OutputTypes OutputType
 	{
 		get { return _outputType; }
