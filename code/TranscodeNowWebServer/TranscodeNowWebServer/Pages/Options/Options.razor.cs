@@ -124,6 +124,9 @@ public partial class Options
 
         message.GeneralOptions!.OutputFileName = outputName;
 
+        if(InitialAudioStream is not null && InitialAudioStream.Channels > 2)
+            message.AudioOptions!.Channels = 2;
+
         return message;
     }
 

@@ -8,6 +8,8 @@ public partial class Download
 {
     private async Task DownloadFileFromURL()
     {
+        // this hack is so ducking dirty that i need at least 3 showers
+        // chromium will accept a mkv or webm under the disguise of an mp4
         await Console.Out.WriteLineAsync(userOptionsService.UserOptions.GeneralOptions.OutputFileName);
         if (userOptionsService.UserOptions.GeneralOptions.OutputFileName.EndsWith("mp4"))
         {
