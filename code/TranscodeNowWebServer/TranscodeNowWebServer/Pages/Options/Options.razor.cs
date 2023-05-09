@@ -1,13 +1,10 @@
 using FFMpegCore;
 using RabbitMQ.Client;
-using System.Reflection;
 using System.Text.Json;
 using System.Text;
 using TranscodeNowWebServer.Data;
 using Microsoft.JSInterop;
-using TranscodeNowWebServer.Interfaces;
 using Microsoft.AspNetCore.Components;
-using FFMpegCore.Enums;
 
 namespace TranscodeNowWebServer.Pages.Options;
 
@@ -51,10 +48,6 @@ public partial class Options
         {
             InitialAudioStream = file.AudioStreams.First();
             _audioOptions = new(InitialAudioStream);
-            // iterate each field in audio stream
-            Console.WriteLine(InitialAudioStream.Channels);
-            Console.WriteLine(InitialAudioStream.BitRate);
-            Console.WriteLine(InitialAudioStream.SampleRateHz);
         }
 
         if (InitialVideoStream is null && InitialAudioStream is null)
@@ -73,18 +66,14 @@ public partial class Options
             return;
         }
 
-        //if (!IsChangesMade()) return;
-
         userOptionsService.UserOptions =
-            GetSelectedOptions(/*InitialVideoStream is not null, InitialAudioStream is not null*/);
+            GetSelectedOptions();
 
         var msg = new MqqtTranscodeMessage(
             fileService.UploadedFileModel,
             userOptionsService.UserOptions
             );
-        string message = JsonSerializer.Serialize(msg);
-        Console.WriteLine(message);
-        return;
+
         SendTranscodeMessage(msg);
         navManager.NavigateTo("result");
     }

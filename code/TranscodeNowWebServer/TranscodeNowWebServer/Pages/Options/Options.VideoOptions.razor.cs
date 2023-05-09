@@ -175,7 +175,8 @@ public class VideoOptions
         get => _frameRate;
         set
         {
-            double result = value ?? _frameRate ?? _videoStream.FrameRate;
+            if (value is null) { _frameRate = null; return; }
+            double result = value.Value;
             if (result < 1) result = 1;
             else if (result > 120) result = 120;
             _frameRate = result;
@@ -187,7 +188,8 @@ public class VideoOptions
         get => _height;
         set
         {
-            int val = value ?? _height ?? _videoStream.Height;
+            if (value is null) { _height = null; return; }
+            int val = value.Value;
             if (val > 4096) val = 4096;
             if (val < 1) val = 1;
 
@@ -214,7 +216,8 @@ public class VideoOptions
         get => _rotation;
         set
         {
-            int val = value ?? _rotation ?? _videoStream.Rotation;
+            if (value is null) { _rotation = null; return; }
+            int val = value.Value;
 
             if (val == 0) { _rotation = null; return; }
             if (val < 0) val += 360;
@@ -298,7 +301,8 @@ public class VideoOptions
         get => _bitrate;
         set
         {
-            long val = value ?? _bitrate ?? _videoStream.BitRate;
+            if (value is null) { _bitrate = null; return; }
+            long val = value.Value;
 
             if (val > 50000) val = 50000;
             else if (val < 0) val = 0;
@@ -312,7 +316,8 @@ public class VideoOptions
         get => _width;
         set
         {
-            int val = value ?? _width ?? _videoStream.Width;
+            if (value is null) { _width = null; return; }
+            int val = value.Value;
 
             if (val > 4096) val = 4096;
             if (val < 1) val = 1;

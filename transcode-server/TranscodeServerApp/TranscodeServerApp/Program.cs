@@ -80,13 +80,6 @@ internal class Program
                 return;
             }
 
-            var a = data.UserOptions.AudioOptions;
-            Console.WriteLine($"{nameof(a.SampleRate)}:{a.SampleRate.ToString() ?? "null"}");
-            Console.WriteLine($"{nameof(a.Bitrate)}:{a.Bitrate.ToString() ?? "null"}");
-            Console.WriteLine($"{nameof(a.Channels)}:{a.Channels.ToString() ?? "null"}");
-            Console.WriteLine($"{nameof(a.RemoveTrack)}:{a.RemoveTrack.ToString() ?? "null"}");
-            Console.WriteLine($"{nameof(a.Normalize)}:{a.Normalize.ToString() ?? "null"}");
-            return;
             Console.WriteLine("Getting command");
 
             string? command = GetCommand(data);
