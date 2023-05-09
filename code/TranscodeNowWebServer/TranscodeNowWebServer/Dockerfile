@@ -5,10 +5,6 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-# Install ffmpeg
-RUN apt-get update 
-RUN apt-get install -y ffmpeg
-
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY ["TranscodeNowWebServer/TranscodeNowWebServer.csproj", "TranscodeNowWebServer/"]
@@ -24,4 +20,6 @@ RUN dotnet publish "TranscodeNowWebServer.csproj" -c Release -o /app/publish /p:
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+COPY --from=mwader/static-ffmpeg:6.0 /ffmpeg /usr/local/bin/
+COPY --from=mwader/static-ffmpeg:6.0 /ffprobe /usr/local/bin/
 ENTRYPOINT ["dotnet", "TranscodeNowWebServer.dll"]

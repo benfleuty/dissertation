@@ -1,21 +1,21 @@
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client;
 using System.Text;
-using RabbitMQ.Client.Exceptions;
-using TranscodeNowWebServer.Data;
-using System.Text.Json;
 using UploadedFilesLibrary;
+using TranscodeNowWebServer.Data;
 
 namespace TranscodeNowWebServer.Pages;
 
 public partial class Result
 {
+    UserOptions _userOptions;
     IModel? channel;
     string? fileName;
     bool listen = true;
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        _userOptions = userOptions.UserOptions;
         var model = UploadedFileService.UploadedFileModel;
 
         if (model == null)
@@ -24,7 +24,7 @@ public partial class Result
             return;
         }
 
-        fileName = model.RandomFileName;
+        fileName = _userOptions.GeneralOptions.OutputFileName;
         if (fileName == null)
         {
             Console.WriteLine($"{Now} fileName is null");
@@ -89,7 +89,7 @@ public partial class Result
     {
         string downloadPath = $"{env.WebRootPath}/uploads";
         if (!Directory.Exists(downloadPath)) { Directory.CreateDirectory(downloadPath); }
-        var file = $"transcoded_{fileName}";
+        var file = userOptions.UserOptions.GeneralOptions.OutputFileName;
         downloadPath = Path.Combine(downloadPath, file);
         FileUploader.DownloadFile(file, downloadPath);
         channel = null;

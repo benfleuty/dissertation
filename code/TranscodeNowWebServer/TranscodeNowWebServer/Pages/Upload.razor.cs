@@ -48,14 +48,13 @@ public partial class Upload
             Message = result.Item2;
             return;
         }
-
         result = await ClientsideFileValidation();
         if (result.Item1 == false)
         {
             Message = result.Item2;
             return;
         }
-
+        
         result = await UploadFileAsync();
         if (result.Item1 == false)
         {
