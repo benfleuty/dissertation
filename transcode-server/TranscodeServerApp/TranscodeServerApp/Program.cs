@@ -3,15 +3,11 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 using System.Text.Json;
-using TranscodeNowWebServer.Data;
 using FluentFTP;
 using System.Net;
 using Microsoft.Extensions.Configuration;
-using System.Threading.Channels;
-using FluentFTP.Helpers;
-using System.Reflection;
 using TranscodeServerApp;
-using RabbitMQ.Client.Exceptions;
+using System.Linq.Expressions;
 
 internal class Program
 {
@@ -62,107 +58,131 @@ internal class Program
 
     static void OnMessageReceived(string message)
     {
-        Console.WriteLine($"{Now} Received message: {message}");
-        var data = JsonSerializer.Deserialize<MqqtTranscodeMessage>(message);
-        if (data is null)
-        {
-            Console.WriteLine($"{Now} Received null message");
-            return;
-        }
-
-        Console.WriteLine("Getting command");
-        string? command = GetCommand(data);
-        if (command is null)
-        {
-            Console.WriteLine($"{Now} Invalid parameter for command");
-            return;
-        }
-        Console.WriteLine($"Got command {command}");
-
-        var fileName = data.FileModel.RandomFileName;
-        if (fileName == null)
-        {
-            Console.WriteLine($"{Now} Null file name");
-            return;
-        }
-
-        Console.WriteLine($"Getting file {fileName}");
-        if (!DownloadFile(fileName))
-        {
-            Console.WriteLine($"{Now} Failed to download file {fileName}");
-            return;
-        }
-        Console.WriteLine($"Got file {fileName}");
-
-        // Create a process to run ffmpeg
-        var process = new Process();
-
-        // Configure the process to run ffmpeg with the downloaded file as input
-        process.StartInfo.FileName = "ffmpeg";
-        process.StartInfo.Arguments = command;
-        process.StartInfo.UseShellExecute = false;
-        process.StartInfo.RedirectStandardOutput = true;
-        process.StartInfo.RedirectStandardError = true;
-        // Start the process and wait for it to complete
-        Console.WriteLine($"Start transcode {fileName} to {GetOutputFileName(fileName)} using\n{process.StartInfo.FileName} {process.StartInfo.Arguments}");
-        process.Start();
-        process.WaitForExit();
-        Console.WriteLine($"Transcoded {fileName} to {GetOutputFileName(fileName)}");
-
-
-        // Print the output of ffmpeg to the console
-        string stdErr = process.StandardError.ReadToEnd();
-        if (stdErr.Length > 0)
-        {
-            Console.WriteLine($"Std Err: {stdErr}");
-            // todo better error finding/parsing
-        }
-
-        string output = "Transcode complete";
-        if (!File.Exists(fileName))
-        {
-            output = "Failed to transcode";
-        }
-
-        Console.WriteLine(output);
-
-        Console.WriteLine("Uploading transcoded file");
-        string outFileName = GetOutputFileName(fileName);
-        MqqtTranscodedMessage msg = new();
-        msg.OriginalFileName = fileName;
-        msg.NewFileName = outFileName;
-        msg.State = "Success";
-        if (!UploadFile(outFileName))
-        {
-            Console.WriteLine($"Failed to upload file {outFileName}");
-            msg.State = "Failed";
-            msg.Message = "Failed to upload file";
-        }
-
+        //debug catchall 
         try
         {
-            var factory = new ConnectionFactory() { HostName = "rabbitmq" };
-            using var connection = factory.CreateConnection();
-            using var channel = connection.CreateModel();
 
-            string queueName = fileName;
-            var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(msg));
+            Console.WriteLine($"{Now} Received message: {message}");
+            Rootobject? data;
+            try
+            {
+                var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                data = JsonSerializer.Deserialize<Rootobject>(message, opts);
+                Console.WriteLine(data.UserOptions == null);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"{Now} Exception parsing json: {e.Message}");
+                return;
+            }
+            if (data is null)
+            {
+                Console.WriteLine($"{Now} Received null message");
+                return;
+            }
 
-            var arguments = new Dictionary<string, object> { { "x-expires", 100 * 60 * 60 * 24 } };
-            channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: arguments);
+            Console.WriteLine("Getting command");
 
-            channel.BasicPublish(exchange: "", routingKey: queueName, body: body);
+            string? command = GetCommand(data);
+            if (command is null)
+            {
+                Console.WriteLine($"{Now} Invalid parameter for command");
+                return;
+            }
+            Console.WriteLine($"Got command {command}");
+
+            var fileName = data.FileModel.RandomFileName;
+            if (fileName == null)
+            {
+                Console.WriteLine($"{Now} Null file name");
+                return;
+            }
+
+            Console.WriteLine($"Getting file {fileName}");
+            if (!DownloadFile(fileName))
+            {
+                Console.WriteLine($"{Now} Failed to download file {fileName}");
+                return;
+            }
+            Console.WriteLine($"Got file {fileName}");
+
+            // Create a process to run ffmpeg
+            var process = new Process();
+
+            // Configure the process to run ffmpeg with the downloaded file as input
+            process.StartInfo.FileName = "ffmpeg";
+            process.StartInfo.Arguments = command;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.RedirectStandardError = true;
+            // Start the process and wait for it to complete
+            Console.WriteLine($"Start transcode {fileName} to {GetOutputFileName(fileName)} using\n{process.StartInfo.FileName} {process.StartInfo.Arguments}");
+            process.Start();
+            process.WaitForExit();
+            Console.WriteLine($"Transcoded {fileName} to {GetOutputFileName(fileName)}");
+
+
+            // Print the output of ffmpeg to the console
+            string stdErr = process.StandardError.ReadToEnd();
+            if (stdErr.Length > 0)
+            {
+                Console.WriteLine($"Std Err: {stdErr}");
+                // todo better error finding/parsing
+            }
+
+            string output = "Transcode complete";
+            if (!File.Exists(fileName))
+            {
+                output = "Failed to transcode";
+            }
+
+            Console.WriteLine(output);
+
+            Console.WriteLine("Uploading transcoded file");
+            string outFileName = GetOutputFileName(fileName);
+            MqqtTranscodedMessage msg = new();
+            msg.OriginalFileName = fileName;
+            msg.NewFileName = outFileName;
+            msg.State = "Success";
+            if (!UploadFile(outFileName))
+            {
+                Console.WriteLine($"Failed to upload file {outFileName}");
+                msg.State = "Failed";
+                msg.Message = "Failed to upload file";
+            }
+
+            try
+            {
+                var factory = new ConnectionFactory() { HostName = "rabbitmq" };
+                using var connection = factory.CreateConnection();
+                using var channel = connection.CreateModel();
+
+                string queueName = fileName;
+                var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(msg));
+
+                var arguments = new Dictionary<string, object> { { "x-expires", 100 * 60 * 60 * 24 } };
+                channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: arguments);
+
+                channel.BasicPublish(exchange: "", routingKey: queueName, body: body);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{Now} Error: {ex.Message}\nFailed to send transcode result to rabbitmq.");
+            }
+
+            Console.WriteLine("finished");
+
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"{Now} Error: {ex.Message}\nFailed to send transcode result to rabbitmq.");
+            Console.WriteLine("Catch all error:\n" + ex.Message);
+            Console.WriteLine(ex.StackTrace);
+            Environment.Exit(1);
         }
-
-        Console.WriteLine("finished");
 
     }
 
-    private static string? GetCommand(MqqtTranscodeMessage data)
+    private static string? GetCommand(Rootobject data)
     {
         var model = data.FileModel;
         var options = data.UserOptions;
@@ -173,23 +193,35 @@ internal class Program
         commandParts.Add($"-i {data.FileModel.RandomFileName}");
 
         // apply user's selected options
-
-        if (options.Height.HasValue && options.Width.HasValue)
+        if (options.VideoOptions is not null)
         {
-            if (options.Height < 1 || options.Width < 1)
-            {
-                Console.WriteLine($"{Now} Invalid height or width {options.Width}x{options.Height}");
-                return null;
-            }
-
-            commandParts.Add($"-vf scale={options.Width}:{options.Height}");
+            Console.WriteLine("Getting video commands");
+            GetVideoCommands(ref commandParts, options.VideoOptions);
+            Console.WriteLine("Got video commands");
         }
+        else Console.WriteLine("Skipping video commands");
 
         // output file name as last parameter
         string outputFileName = GetOutputFileName(model.RandomFileName);
         commandParts.Add(outputFileName);
 
         return string.Join(" ", commandParts);
+
+    }
+
+    private static void GetVideoCommands(ref List<string> commandParts, Videooptions options)
+    {
+
+        if (options.Height.HasValue && options.Width.HasValue)
+        {
+            if (options.Height < 1 || options.Width < 1)
+            {
+                Console.WriteLine($"{Now} Invalid height or width {options.Width}x{options.Height}");
+                return;
+            }
+
+            commandParts.Add($"-vf scale={options.Width}:{options.Height}");
+        }
     }
 
     static string GetOutputFileName(string fileName) => "transcoded_" + fileName;
@@ -254,4 +286,66 @@ internal class Program
     }
 
     private static string Now => DateTime.UtcNow.ToString("dd/MM/yyyy HH:mm:ss");
+}
+
+
+
+public class Rootobject
+{
+    public Filemodel? FileModel { get; set; }
+    public Useroptions? UserOptions { get; set; }
+}
+
+public class Filemodel
+{
+    public int? Id { get; set; }
+    public string? OriginalFileName { get; set; }
+    public string? RandomFileName { get; set; }
+}
+
+public class Useroptions
+{
+    public Generaloptions? GeneralOptions { get; set; }
+    public Videooptions? VideoOptions { get; set; }
+    public Audiooptions? AudioOptions { get; set; }
+}
+
+public class Generaloptions
+{
+    public object? OutputFileName { get; set; }
+    public string? OutputType { get; set; }
+}
+
+public class Videooptions
+{
+    public object? CropBottom { get; set; }
+    public object? CropLeft { get; set; }
+    public object? CropRight { get; set; }
+    public object? CropTop { get; set; }
+    public int? EndTimeHours { get; set; }
+    public int? EndTimeMinutes { get; set; }
+    public int? EndTimeSeconds { get; set; }
+    public int? FrameRate { get; set; }
+    public int? Height { get; set; }
+    public bool? HFlip { get; set; }
+    public object? OutputFormat { get; set; }
+    public int? Rotation { get; set; }
+    public int? StartTimeHours { get; set; }
+    public int? StartTimeMinutes { get; set; }
+    public int? StartTimeSeconds { get; set; }
+    public bool? VFlip { get; set; }
+    public int? BitRate { get; set; }
+    public object? VideoCodec { get; set; }
+    public int? Width { get; set; }
+}
+
+public class Audiooptions
+{
+    public object? Channels { get; set; }
+    public object? AudioBitrate { get; set; }
+    public bool? IsCustomBitrate { get; set; }
+    public object? AudioCodec { get; set; }
+    public bool? NormalizeAudio { get; set; }
+    public bool? RemoveTrack { get; set; }
+    public object? SampleRate { get; set; }
 }
