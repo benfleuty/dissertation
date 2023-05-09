@@ -263,7 +263,7 @@ internal class Program
             int bottom = options.CropBottom ?? 0;
             int left = options.CropLeft ?? 0;
             int right = options.CropRight ?? 0;
-            string crop = $"crop=in_w-{left}-{right}:in_h-{top}-{bottom}:{left}:{top}";
+            string crop = $"crop=in_w-{left + right}:in_h-{top + bottom}";
             dashVf.Add(crop);
         }
 

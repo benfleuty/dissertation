@@ -1,0 +1,20 @@
+﻿@page "/transcode"
+@using TranscodeNowWebServer.Interfaces
+@inject IJSRuntime jsRuntime
+@inject IHttpContextAccessor HttpContextAccessor
+@inject IUploadedFileService UploadedFileService
+@inject IUserOptions userOptions
+@inject IWebHostEnvironment env
+@inject NavigationManager nav
+<div class="container">
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="text-center">
+                <h1>Your file is being transcoded!</h1>
+            </div>
+            <p>
+                Hang tight! Your file is being transcoded. This may take a while, depending on the size of your file and the settings you chose. When your file is ready, you will be automatically taken to the download page.
+            </p>
+        </div>
+    </div>
+</div>

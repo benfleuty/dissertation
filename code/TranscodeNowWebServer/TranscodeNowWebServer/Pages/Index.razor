@@ -1,14 +1,107 @@
 ﻿@page "/"
-@inject NavigationManager nav
-@using TranscodeNowWebServer.TranscodeComponents
-
+@page "/index"
+@page "/home"
+@inject IJSRuntime js
 <PageTitle>Index</PageTitle>
-
 <h1 class="text-center">Welcome to TranscodeNow!</h1>
-
-<p class="text-center mx-2">TranscodeNow aims to provide a transcoding service that anyone can use effectively!</p>
-
-<div class="get-started text-center">
-    <a href="/upload" class="btn btn-primary btn-block" style="width:80%; ">Get Started</a>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header">
+                    What is TranscodeNow?
+                </div>
+                <div class="card-body">
+                    <p>
+                        TranscodeNow is a free online transcoding service. It allows you to convert your files from one format to another, without having to install any software on your computer. The goal of TranscodeNow is to make the process of transcoding as simple and user-friendly as possible. By providing an easy-to-use and -understand inputs and explanations, anyone can convert their files without needing technical knowledge of transcoding.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header">
+                    What is Transcoding?
+                </div>
+                <div class="card-body">
+                    <p>
+                        Transcoding is the process of converting a digital file from one format to another, usually to make it compatible with different devices or software. For example, if you have a video file in a format that is not supported by your media player or streaming service, you can use a transcoding service to convert it to a compatible format.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header">
+                    Why TranscodeNow?
+                </div>
+                <div class="card-body">
+                    There are many online transcoding services available online, all of which provide varying levels of help to the user. TranscodeNow aims to provide detailed yet concise explanations and guidance to let you make the most of transcoding.
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header">
+                    How do I TranscodeNow?
+                </div>
+                <div class="card-body">
+                    <p>
+                        We will guide you through the process of transcoding your files, from start to finish.
+                    </p>
+                    <ol>
+                        <li>
+                            First, you will need to upload your file. You can do this by clicking the "Upload" button at the top of the page. You will then be prompted to select a file from your computer. Once you have selected a file, you will be taken to the next step. You can also drag and drop a file onto the page to upload it.
+                        </li>
+                        <li>
+                            The next step is to select the settings for your transcoded file. You can choose the format, resolution, and bitrate of your file, among other settings. Once you have selected your settings, you can click the "Transcode" button to start the transcoding process.
+                            <br />
+                            On the settings page, you will see blue question marks next to some of the settings. These are tooltips, which provide more information about the setting when you click on them. They look like this:
+                            <span class="help-favicon" @onclick="@(() => js.InvokeVoidAsync("showModal"))">
+                                <i class="fas fa-question-circle"></i>
+                            </span>
+                            and clicking on them will show a popup with more information. Try it now!
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="card mb-3">
+                <div class="card-header text-center">
+                    Ready to Start?
+                </div>
+                <div class="card-body">
+                    <div class="text-center">
+                        <a href="/upload" class="btn btn-primary btn-block text-center">Get Started</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<range-selector min-range="0" max-range="1000" />
+
+<div class="modal" id="helpModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">This is what a tooltip looks like</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Tool tips will provide you with information about the setting(s) that they relate to. Where appropriate, we also provide some examples</p>
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        I am an example of an example, I am in a box to help differentiate me from the description.
+                    </li>
+                    <li class="list-group-item">
+                        I'm another example!
+                    </li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

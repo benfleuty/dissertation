@@ -6,7 +6,7 @@ using TranscodeNowWebServer.Data;
 
 namespace TranscodeNowWebServer.Pages;
 
-public partial class Result
+public partial class Transcode
 {
     UserOptions _userOptions;
     IModel? channel;
